@@ -1,5 +1,6 @@
 package com.example.backend.service.impl;
 
+import com.example.backend.dto.UserDto;
 import com.example.backend.dto.request.FormLogin;
 import com.example.backend.dto.request.FormRegister;
 import com.example.backend.dto.response.ResponseSuccess;
@@ -82,7 +83,8 @@ public class UserServiceImpl implements IUserService {
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
         user.setRoles(roles);
-//        user.setOtpCode(generateUUID());
+
+        //        user.setOtpCode(generateUUID());
         user.setOtpCode(generateRandomString(6));
         userRepository.save(user);
         ResponseSuccess response = ResponseSuccess.builder()
@@ -131,6 +133,11 @@ public class UserServiceImpl implements IUserService {
         return responseUser;
     }
 
+    @Override
+    public UserDto findById(Long id) {
+        return userRepository.findUserById(id).orElse(null);
+    }
+
     public User findByEmail(String email) {
         return userRepository.findUserByEmail(email).orElse(null);
     }
@@ -166,6 +173,7 @@ public class UserServiceImpl implements IUserService {
             return false;
         }
         return true;
+
     }
 
     public Boolean checkIsDelete(String email) {
