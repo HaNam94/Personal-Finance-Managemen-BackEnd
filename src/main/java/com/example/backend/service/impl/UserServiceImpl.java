@@ -51,12 +51,12 @@ public class UserServiceImpl implements IUserService {
         }
         if (checkIsExistPhone(formRegister.getPhone())) {
 
-            map.put("password", "Password da ton tai");
+            map.put("phone", "So dien thoai da ton tai");
 
         }
         if (!checkBirthdayBeforeEighteenYearAgo(formRegister.getDob())) {
 
-            map.put("birthday", "Ban chua du 18 tuoi");
+            map.put("dob", "Ban chua du 18 tuoi");
         }
         if (bindingResult.hasErrors()) {
             for (FieldError err : bindingResult.getFieldErrors()) {
@@ -67,9 +67,9 @@ public class UserServiceImpl implements IUserService {
             throw new CustomValidationException(map);
         }
 
-//        User user = genericMapperImpl.formRegisterToEntity(formRegister);
+
         User user = User.builder()
-                .username(formRegister.getEmail())
+                .username(formRegister.getUsername())
                 .email(formRegister.getEmail())
                 .password(passwordEncoder.encode(formRegister.getPassword()))
                 .dob(formRegister.getDob())
@@ -77,10 +77,12 @@ public class UserServiceImpl implements IUserService {
                 .isAccountGoogle(false)
                 .isDelete(false)
                 .userStatus(true)
+                .otpCodeVerifed(false)
                 .build();
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
         user.setRoles(roles);
+
         //        user.setOtpCode(generateUUID());
         user.setOtpCode(generateRandomString(6));
         userRepository.save(user);
@@ -98,7 +100,11 @@ public class UserServiceImpl implements IUserService {
         Map<String, String> errMap = new HashMap<>();
         System.out.println(checkIsExistEmail(formLogin.getEmail()));
         if (!checkIsExistEmail(formLogin.getEmail())) {
-            errMap.put("user", "Tai khoan da bi xoa");
+            errMap.put("user", "Tai khoan khong ton tai");
+            throw new CustomValidationException(errMap);
+        }
+        if (!user.getOtpCodeVerifed()){
+            errMap.put("otpCodeVerifed", "Tai khoan chua active");
             throw new CustomValidationException(errMap);
         }
 
