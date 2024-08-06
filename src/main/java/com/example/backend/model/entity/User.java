@@ -24,6 +24,9 @@ public class User {
     private String avatar;
     private LocalDate dob;
     private String phone;
+    private Boolean isAccountGoogle;
+    private Boolean isDelete;
+    private Boolean userStatus;
     private String otpCode;
     private String otpCodeVerifed;
     private String resetToken;
