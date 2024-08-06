@@ -26,7 +26,7 @@ public class User {
     private Boolean isDelete;
     private Boolean userStatus;
     private String otpCode;
-    private String otpCodeVerifed;
+    private Boolean otpCodeVerifed;
     private String resetToken;
     private String resetTokenValidAt;
     @ManyToMany(fetch = FetchType.EAGER)

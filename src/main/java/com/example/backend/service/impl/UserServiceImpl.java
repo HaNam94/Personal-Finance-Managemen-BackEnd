@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -50,12 +51,12 @@ public class UserServiceImpl implements IUserService {
         }
         if (checkIsExistPhone(formRegister.getPhone())) {
 
-            map.put("password", "Password da ton tai");
+            map.put("phone", "So dien thoai da ton tai");
 
         }
         if (!checkBirthdayBeforeEighteenYearAgo(formRegister.getDob())) {
 
-            map.put("birthday", "Ban chua du 18 tuoi");
+            map.put("dob", "Ban chua du 18 tuoi");
         }
         if (bindingResult.hasErrors()) {
             for (FieldError err : bindingResult.getFieldErrors()) {
@@ -66,9 +67,9 @@ public class UserServiceImpl implements IUserService {
             throw new CustomValidationException(map);
         }
 
-//        User user = genericMapperImpl.formRegisterToEntity(formRegister);
+
         User user = User.builder()
-                .username(formRegister.getEmail())
+                .username(formRegister.getUsername())
                 .email(formRegister.getEmail())
                 .password(passwordEncoder.encode(formRegister.getPassword()))
                 .dob(formRegister.getDob())
@@ -76,10 +77,13 @@ public class UserServiceImpl implements IUserService {
                 .isAccountGoogle(false)
                 .isDelete(false)
                 .userStatus(true)
+                .otpCodeVerifed(false)
                 .build();
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
         user.setRoles(roles);
+//        user.setOtpCode(generateUUID());
+        user.setOtpCode(generateRandomString(6));
         userRepository.save(user);
         ResponseSuccess response = ResponseSuccess.builder()
                 .message("DK OK")
@@ -95,7 +99,11 @@ public class UserServiceImpl implements IUserService {
         Map<String, String> errMap = new HashMap<>();
         System.out.println(checkIsExistEmail(formLogin.getEmail()));
         if (!checkIsExistEmail(formLogin.getEmail())) {
-            errMap.put("user", "Tai khoan da bi xoa");
+            errMap.put("user", "Tai khoan khong ton tai");
+            throw new CustomValidationException(errMap);
+        }
+        if (!user.getOtpCodeVerifed()){
+            errMap.put("otpCodeVerifed", "Tai khoan chua active");
             throw new CustomValidationException(errMap);
         }
 
@@ -163,5 +171,23 @@ public class UserServiceImpl implements IUserService {
     public Boolean checkIsDelete(String email) {
         User user = findByEmail(email);
         return user.getIsDelete();
+    }
+
+    public  String generateUUID() {
+
+        return UUID.randomUUID().toString();
+    }
+
+    public static String generateRandomString(int length) {
+        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String CHARACTERS2 = "21984651689789167925315482100251002150005" +
+                "48798620";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(CHARACTERS2.length());
+            sb.append(CHARACTERS2.charAt(index));
+        }
+        return sb.toString();
     }
 }
