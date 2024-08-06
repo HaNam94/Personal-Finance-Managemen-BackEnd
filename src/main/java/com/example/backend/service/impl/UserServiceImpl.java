@@ -82,7 +82,8 @@ public class UserServiceImpl implements IUserService {
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
         user.setRoles(roles);
-//        user.setOtpCode(generateUUID());
+
+        //        user.setOtpCode(generateUUID());
         user.setOtpCode(generateRandomString(6));
         userRepository.save(user);
         ResponseSuccess response = ResponseSuccess.builder()
@@ -166,6 +167,7 @@ public class UserServiceImpl implements IUserService {
             return false;
         }
         return true;
+
     }
 
     public Boolean checkIsDelete(String email) {
