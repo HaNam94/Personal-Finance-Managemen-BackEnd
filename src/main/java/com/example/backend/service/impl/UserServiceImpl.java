@@ -1,5 +1,6 @@
 package com.example.backend.service.impl;
 
+import com.example.backend.dto.UserDto;
 import com.example.backend.dto.request.FormLogin;
 import com.example.backend.dto.request.FormRegister;
 import com.example.backend.dto.response.ResponseSuccess;
@@ -130,6 +131,11 @@ public class UserServiceImpl implements IUserService {
                 .accessToken(accessToken)
                 .build();
         return responseUser;
+    }
+
+    @Override
+    public UserDto findById(Long id) {
+        return userRepository.findUserById(id).orElse(null);
     }
 
     public User findByEmail(String email) {
