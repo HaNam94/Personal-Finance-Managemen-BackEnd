@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -80,6 +81,8 @@ public class UserServiceImpl implements IUserService {
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
         user.setRoles(roles);
+        //        user.setOtpCode(generateUUID());
+        user.setOtpCode(generateRandomString(6));
         userRepository.save(user);
         ResponseSuccess response = ResponseSuccess.builder()
                 .message("DK OK")
@@ -158,10 +161,29 @@ public class UserServiceImpl implements IUserService {
             return false;
         }
         return true;
+
     }
 
     public Boolean checkIsDelete(String email) {
         User user = findByEmail(email);
         return user.getIsDelete();
+    }
+
+    public  String generateUUID() {
+
+        return UUID.randomUUID().toString();
+    }
+
+    public static String generateRandomString(int length) {
+        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String CHARACTERS2 = "21984651689789167925315482100251002150005" +
+                "48798620";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(CHARACTERS2.length());
+            sb.append(CHARACTERS2.charAt(index));
+        }
+        return sb.toString();
     }
 }
