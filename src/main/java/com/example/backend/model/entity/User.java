@@ -1,12 +1,10 @@
 package com.example.backend.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -14,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +21,12 @@ public class User {
     private String email;
     private String password;
     private String avatar;
-    private LocalDate dob;
-    private String phone;
+    private Boolean isAccountGoogle;
+    private Boolean isDelete;
+    private Boolean userStatus;
+    private Boolean isActive;
     private String otpCode;
-    private String otpCodeVerifed;
+    private LocalDateTime otpGenerateTime;
     private String resetToken;
     private String resetTokenValidAt;
     @ManyToMany(fetch = FetchType.EAGER)

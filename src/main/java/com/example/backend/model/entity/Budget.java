@@ -23,6 +23,8 @@ public class Budget {
     private BigDecimal budgetAmount;
     private String budgetDescription;
     private LocalDate budgetDate;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Category> category;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User user;
 }
