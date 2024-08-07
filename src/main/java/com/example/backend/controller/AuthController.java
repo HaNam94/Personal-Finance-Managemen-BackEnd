@@ -47,6 +47,15 @@ public class AuthController {
             return new ResponseEntity<>(responseSuccess, HttpStatus.OK);
 
     }
+    @PutMapping("/public/verify-account")
+    public ResponseEntity<String> verifyAccount(@RequestParam String email,
+                                                @RequestParam String otp) {
+        return new ResponseEntity<>(userService.verifyAccount(email, otp), HttpStatus.OK);
+    }
+    @PutMapping("/public/regenerate-otp")
+    public ResponseEntity<String> regenerateOtp(@RequestParam String email) {
+        return new ResponseEntity<>(userService.regenerateOtp(email), HttpStatus.OK);
+    }
     @PostMapping("/public/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestParam String email) {
         User user = userService.findByEmail(email);
