@@ -1,10 +1,7 @@
 package com.example.backend.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -14,6 +11,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Setter
 @Getter
+@Builder
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,9 +19,9 @@ public class Wallet {
     private String walletName;
     private String icon;
     private String walletDescription;
-    private BigDecimal currency;
-    private Integer amount;
-    private Integer walletStatus;
+    private String currency;
+    private BigDecimal amount;
+    private Boolean walletStatus;
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<User> users;
     @ManyToMany
