@@ -2,7 +2,6 @@ package com.example.backend.service.impl;
 
 import com.example.backend.dto.UserDto;
 import com.example.backend.dto.UserUpdateDto;
-import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.request.FormLogin;
 import com.example.backend.dto.request.FormRegister;
 import com.example.backend.dto.response.ResponseSuccess;

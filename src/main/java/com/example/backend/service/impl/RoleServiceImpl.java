@@ -3,5 +3,5 @@ package com.example.backend.service.impl;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TransactionService {
+public class RoleServiceImpl {
 }
