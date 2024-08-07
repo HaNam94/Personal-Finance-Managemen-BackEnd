@@ -23,6 +23,8 @@ public class User {
     private String avatar;
     private Boolean isAccountGoogle;
     private Boolean isDelete;
+    private LocalDate dob;
+    private String phone;
     private Boolean userStatus;
     private Boolean isActive;
     private String otpCode;
