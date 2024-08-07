@@ -2,24 +2,25 @@ package com.example.backend.service.impl;
 
 import com.example.backend.dto.UserDto;
 import com.example.backend.dto.UserUpdateDto;
+import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.request.FormLogin;
 import com.example.backend.dto.request.FormRegister;
 import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.dto.response.ResponseUser;
 import com.example.backend.exception.CustomValidationException;
 import com.example.backend.exception.NotFoundException;
-import com.example.backend.model.entity.Role;
-import com.example.backend.model.entity.User;
-import com.example.backend.repository.IRoleRepo;
-import com.example.backend.repository.IUserRepo;
+import com.example.backend.model.entity.*;
+import com.example.backend.repository.*;
 import com.example.backend.security.jwt.JWTProvider;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IUserService;
 import com.example.backend.util.EmailUtil;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,13 +43,15 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements IUserService {
-    private final IUserRepo IUserRepository;
+    private final IUserRepo userRepository;
     private final IRoleRepo roleRepository;
-//    private final UserGenericMapperImpl genericMapperImpl;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final JWTProvider jwtProvider;
     private final EmailUtil emailUtil;
+    private final IWalletRepo walletRepository;
+    private final ITransactionRepo transactionRepository;
+    private final IBudgetRepo budgetRepository;
 
     @Value("${upload.path}")
     private String fileUpload;
@@ -100,10 +103,8 @@ public class UserServiceImpl implements IUserService {
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
         user.setRoles(roles);
-
-        //        user.setOtpCode(generateUUID());
         user.setOtpCode(otpCode);
-        IUserRepository.save(user);
+        userRepository.save(user);
         ResponseSuccess response = ResponseSuccess.builder()
                 .message("DK OK")
                 .build();
@@ -114,19 +115,19 @@ public class UserServiceImpl implements IUserService {
     public String verifyAccount(String email, String otp) {
 
 
-        User user = IUserRepository.findUserByEmail(email)
+        User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
 //        if (user.getOtpCode().equals(otp) && Duration.between(user.getOtpGenerateTime(),
 //                LocalDateTime.now()).getSeconds() < (1 * 60)) {
             user.setIsActive(true);
-            IUserRepository.save(user);
+            userRepository.save(user);
             return "OTP verified you can login";
 //        }
 //        return "Please regenerate otp and try again";
     }
 
     public String regenerateOtp(String email) {
-        User user = IUserRepository.findUserByEmail(email)
+        User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
         String otp = generateRandomString(6);
 
@@ -137,7 +138,7 @@ public class UserServiceImpl implements IUserService {
         }
         user.setOtpCode(otp);
         user.setOtpGenerateTime(LocalDateTime.now());
-        IUserRepository.save(user);
+        userRepository.save(user);
         return "Email sent... please verify account within 1 minute";
     }
 
@@ -182,12 +183,12 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserDto findUserByEmail(String email) {
-        return IUserRepository.findByEmail(email).orElse(null);
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     @Override
     public void updateUser(CustomUserDetails userDetails, UserUpdateDto userUpdateDto) {
-        Optional<User> userOptional = IUserRepository.findUserByEmail(userDetails.getUsername());
+        Optional<User> userOptional = userRepository.findUserByEmail(userDetails.getUsername());
 
         if (userOptional.isEmpty()) {
             throw new NotFoundException("User not found");
@@ -222,17 +223,42 @@ public class UserServiceImpl implements IUserService {
             user.setAvatar(avatarFileName);
         }
 
-        IUserRepository.save(user);
+        userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public ResponseSuccess deleteUserById(Long id) {
+        List<Wallet> wallets = walletRepository.findAllByUserId(id);
+        wallets.forEach(wallet -> {
+            List<Transaction> transactions = transactionRepository.getTransactionsByWalletId(wallet.getId());
+            transactions.forEach(transaction -> {
+                transactionRepository.deleteTransactionById(transaction.getId());
+            });
+            walletRepository.deleteWalletByID(wallet.getId());
+
+        });
+
+        List<Budget> budgets = budgetRepository.getBudgetsByUserId(id);
+        budgets.forEach(budget -> {
+            budgetRepository.deleteBudgetById(budget.getId());
+        });
+
+        userRepository.deleteUserById(id);
+        ResponseSuccess responseSuccess = new ResponseSuccess();
+        responseSuccess.setMessage("Delete success");
+        responseSuccess.setStatus(HttpStatus.OK);
+        return responseSuccess;
     }
 
     @Override
     public void save(User user) {
-        IUserRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
     public User findByResetToken(String token) {
-        return IUserRepository.findByResetToken(token);
+        return userRepository.findByResetToken(token);
     }
 
     private String saveFile(MultipartFile multipartFile) {
@@ -249,7 +275,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public User findByEmail(String email) {
-        return IUserRepository.findUserByEmail(email).orElse(null);
+        return userRepository.findUserByEmail(email).orElse(null);
     }
 
     public Boolean checkIsExistEmail(String email) {
@@ -261,7 +287,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public Boolean checkIsExistPhone(String phone) {
-        User user = IUserRepository.findUserByPhone(phone).orElse(null);
+        User user = userRepository.findUserByPhone(phone).orElse(null);
         if (user == null) {
             return false;
         }
@@ -278,7 +304,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public Boolean checkEmailAndPassword(String email, String pass) {
-        User user = IUserRepository.findUserByEmailAndPassword(email, pass).orElse(null);
+        User user = userRepository.findUserByEmailAndPassword(email, pass).orElse(null);
         if (user == null) {
             return false;
         }

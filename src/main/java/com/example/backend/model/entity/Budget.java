@@ -25,4 +25,6 @@ public class Budget {
     private LocalDate budgetDate;
     @ManyToMany
     private List<Category> category;
+    @ManyToOne
+    private User user;
 }

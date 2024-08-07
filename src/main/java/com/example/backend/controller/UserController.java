@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.UserDto;
 import com.example.backend.dto.UserUpdateDto;
+import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +66,11 @@ public class UserController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         userService.updateUser(userDetails, userUpdateDto);
         return new ResponseEntity<>("{}", HttpStatus.OK);
+    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
+        ResponseSuccess responseSuccess = userService.deleteUserById(id);
+        return new ResponseEntity<>(responseSuccess.getMessage(),responseSuccess.getStatus());
     }
 
 }
