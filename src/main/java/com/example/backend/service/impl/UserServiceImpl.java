@@ -225,6 +225,16 @@ public class UserServiceImpl implements IUserService {
         IUserRepository.save(user);
     }
 
+    @Override
+    public void save(User user) {
+        IUserRepository.save(user);
+    }
+
+    @Override
+    public User findByResetToken(String token) {
+        return IUserRepository.findByResetToken(token);
+    }
+
     private String saveFile(MultipartFile multipartFile) {
         if (multipartFile == null || multipartFile.isEmpty()) {
             return null;
