@@ -48,10 +48,10 @@ public class AuthController {
 
     }
     @PostMapping("/public/forgot-password")
-    public String forgotPassword(@RequestParam String email) {
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
         User user = userService.findByEmail(email);
         if (user == null) {
-            return "Email không tồn tại!";
+            return ResponseEntity.badRequest().body("Email không tồn tại!");
         }
 
         String token = UUID.randomUUID().toString();
@@ -61,7 +61,7 @@ public class AuthController {
         String resetPasswordLink = "http://localhost:3000/reset-password?token=" + token;
         sendEmail(email, resetPasswordLink);
 
-        return "Đã gửi email khôi phục mật khẩu!";
+        return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
     private void sendEmail(String email, String resetPasswordLink) {
