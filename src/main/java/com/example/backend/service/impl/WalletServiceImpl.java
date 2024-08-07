@@ -46,10 +46,41 @@ public class WalletServiceImpl implements IWalletService {
         roles.add(role);
         wallet.setUsers(users);
         wallet.setRoles(roles);
+        walletRepository.save(wallet);
         ResponseSuccess responseSuccess = new ResponseSuccess();
         responseSuccess.setMessage("Successfully saved wallet");
         responseSuccess.setStatus(HttpStatus.CREATED);
         return responseSuccess;
+    }
+
+    @Override
+    public ResponseSuccess updateWallet(Long id, WalletDto walletDto) {
+        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        wallet.setWalletName(walletDto.getWalletName());
+        wallet.setCurrency(walletDto.getCurrency());
+        wallet.setAmount(walletDto.getAmount());
+        wallet.setIcon(walletDto.getIcon());
+        wallet.setWalletDescription(walletDto.getWalletDescription());
+        walletRepository.save(wallet);
+        ResponseSuccess responseSuccess = new ResponseSuccess();
+        responseSuccess.setMessage("Successfully updated wallet");
+        responseSuccess.setStatus(HttpStatus.OK);
+
+        return responseSuccess;
+    }
+
+    @Override
+    public WalletDto findWalletById(Long id) {
+        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        WalletDto walletDto = WalletDto.builder()
+                .walletName(wallet.getWalletName())
+                .icon(wallet.getIcon())
+                .walletDescription(wallet.getWalletDescription())
+                .currency(wallet.getCurrency())
+                .amount(wallet.getAmount())
+                .id(wallet.getId())
+                .build();
+        return walletDto;
     }
 
     @Override

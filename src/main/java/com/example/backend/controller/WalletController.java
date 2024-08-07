@@ -45,4 +45,22 @@ public class WalletController {
         ResponseSuccess responseSuccess = walletService.saveWallet(walletDto, (CustomUserDetails) authentication.getPrincipal());
         return new ResponseEntity<>(responseSuccess.getMessage(), responseSuccess.getStatus());
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getWalletById(@PathVariable Long id) {
+       return new ResponseEntity<>(walletService.findWalletById(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<?> updateWallet(@PathVariable Long id, @RequestBody WalletDto walletDto, BindingResult result) {
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : result.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
+        ResponseSuccess responseSuccess = walletService.updateWallet(id, walletDto);
+        return new ResponseEntity<>(responseSuccess.getMessage(), responseSuccess.getStatus());
+    }
 }
