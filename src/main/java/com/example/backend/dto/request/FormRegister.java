@@ -24,13 +24,13 @@ public class FormRegister {
     @NotNull(message = ValidationMessage.NOT_NULL)
     @Pattern(regexp = Regex.REGEX_PASS, message = ValidationMessage.ERR_REGEX_PASS)
     private String password;
-    @NotNull(message = ValidationMessage.NOT_NULL)
-    @Pattern(regexp = Regex.REGEX_PHONE, message = ValidationMessage.ERR_REGEX_PHONE)
-    private String phone;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = ValidationMessage.NOT_NULL)
-    @Past(message = ValidationMessage.ERR_DATE_PAST)
-    private LocalDate dob;
+//    @NotNull(message = ValidationMessage.NOT_NULL)
+//    @Pattern(regexp = Regex.REGEX_PHONE, message = ValidationMessage.ERR_REGEX_PHONE)
+//    private String phone;
+//    @DateTimeFormat(pattern = "yyyy-MM-dd")
+//    @NotNull(message = ValidationMessage.NOT_NULL)
+//    @Past(message = ValidationMessage.ERR_DATE_PAST)
+//    private LocalDate dob;
 
 
 

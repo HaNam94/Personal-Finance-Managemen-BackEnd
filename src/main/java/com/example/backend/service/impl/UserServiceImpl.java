@@ -64,15 +64,7 @@ public class UserServiceImpl implements IUserService {
             map.put("email", "Email da ton tai");
 
         }
-        if (checkIsExistPhone(formRegister.getPhone())) {
 
-            map.put("phone", "So dien thoai da ton tai");
-
-        }
-        if (!checkBirthdayBeforeEighteenYearAgo(formRegister.getDob())) {
-
-            map.put("dob", "Ban chua du 18 tuoi");
-        }
         if (bindingResult.hasErrors()) {
             for (FieldError err : bindingResult.getFieldErrors()) {
                 map.put(err.getField(), err.getDefaultMessage());
@@ -92,15 +84,13 @@ public class UserServiceImpl implements IUserService {
                 .username(formRegister.getUsername())
                 .email(formRegister.getEmail())
                 .password(passwordEncoder.encode(formRegister.getPassword()))
-                .dob(formRegister.getDob())
-                .phone(formRegister.getPhone())
                 .isAccountGoogle(false)
                 .isDelete(false)
                 .userStatus(true)
                 .isActive(false)
                 .build();
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
+        roles.add(roleRepository.findRolesByRoleName("ROLE_USER").orElseThrow(()-> new RuntimeException("Role not found")));
         user.setRoles(roles);
         user.setOtpCode(otpCode);
         userRepository.save(user);
@@ -169,8 +159,6 @@ public class UserServiceImpl implements IUserService {
         ResponseUser responseUser = ResponseUser.builder()
                 .email(user.getEmail())
                 .userStatus(user.getUserStatus())
-                .phone(user.getPhone())
-                .dob(user.getDob())
                 .avatar(user.getAvatar())
                 .fullName(user.getUsername())
                 .isDelete(user.getIsDelete())
@@ -199,12 +187,6 @@ public class UserServiceImpl implements IUserService {
 
         if (userUpdateDto.getUsername() != null && !userUpdateDto.getUsername().isEmpty()) {
             user.setUsername(userUpdateDto.getUsername());
-        }
-        if (userUpdateDto.getDob() != null) {
-            user.setDob(userUpdateDto.getDob());
-        }
-        if (userUpdateDto.getPhone() != null) {
-            user.setPhone(userUpdateDto.getPhone());
         }
 
         if (userUpdateDto.getNewPassword() != null) {
@@ -286,10 +268,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     public Boolean checkIsExistPhone(String phone) {
-        User user = userRepository.findUserByPhone(phone).orElse(null);
-        if (user == null) {
-            return false;
-        }
+//        User user = userRepository.findUserByPhone(phone).orElse(null);
+//        if (user == null) {
+//            return false;
+//        }
         return true;
     }
 

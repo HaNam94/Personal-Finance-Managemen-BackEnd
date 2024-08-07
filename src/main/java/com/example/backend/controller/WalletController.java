@@ -5,6 +5,7 @@ import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.model.entity.Wallet;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IWalletService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class WalletController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addWallet(@RequestBody WalletDto walletDto, BindingResult result, Authentication authentication) {
+    public ResponseEntity<?> addWallet(@Valid @RequestBody WalletDto walletDto, BindingResult result, Authentication authentication) {
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : result.getFieldErrors()) {
@@ -52,7 +53,7 @@ public class WalletController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<?> updateWallet(@PathVariable Long id, @RequestBody WalletDto walletDto, BindingResult result) {
+    public ResponseEntity<?> updateWallet(@PathVariable Long id, @Valid @RequestBody WalletDto walletDto, BindingResult result) {
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : result.getFieldErrors()) {
@@ -62,5 +63,26 @@ public class WalletController {
         }
         ResponseSuccess responseSuccess = walletService.updateWallet(id, walletDto);
         return new ResponseEntity<>(responseSuccess.getMessage(), responseSuccess.getStatus());
+    }
+
+    @PutMapping("/edit-wallet_amount/{id}")
+    public ResponseEntity<?> updateWalletAmount(@PathVariable Long id, @Valid @RequestBody WalletDto walletDto, BindingResult result) {
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : result.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
+        walletService.updateWalletAmount(id,walletDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/share-wallet")
+    public ResponseEntity<?> getShareWallet(@RequestParam("walletid") Long id
+                                            ,@RequestParam("email") String email
+                                            ,@RequestParam("roleName") String roleName) {
+        walletService.shareWallet(id,email,roleName);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
