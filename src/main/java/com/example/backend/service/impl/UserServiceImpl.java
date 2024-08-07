@@ -90,7 +90,7 @@ public class UserServiceImpl implements IUserService {
                 .isActive(false)
                 .build();
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
+        roles.add(roleRepository.findRolesByRoleName("ROLE_USER").orElseThrow(()-> new RuntimeException("Role not found")));
         user.setRoles(roles);
         user.setOtpCode(otpCode);
         userRepository.save(user);

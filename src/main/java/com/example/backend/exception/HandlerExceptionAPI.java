@@ -1,6 +1,5 @@
-package com.example.backend.advice;
+package com.example.backend.exception;
 
-import com.example.backend.exception.CustomValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
