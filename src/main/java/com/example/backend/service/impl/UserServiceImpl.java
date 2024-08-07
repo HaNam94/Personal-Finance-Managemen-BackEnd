@@ -1,11 +1,13 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.UserDto;
+import com.example.backend.dto.UserUpdateDto;
 import com.example.backend.dto.request.FormLogin;
 import com.example.backend.dto.request.FormRegister;
 import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.dto.response.ResponseUser;
 import com.example.backend.exception.CustomValidationException;
+import com.example.backend.exception.NotFoundException;
 import com.example.backend.model.entity.Role;
 import com.example.backend.model.entity.User;
 import com.example.backend.repository.IRoleRepo;
@@ -15,15 +17,20 @@ import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
@@ -39,7 +46,8 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final JWTProvider jwtProvider;
 
-
+    @Value("${upload.path}")
+    private String fileUpload;
 
     @Override
     public ResponseSuccess register(FormRegister formRegister, BindingResult bindingResult) {
@@ -134,8 +142,61 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserDto findById(Long id) {
-        return userRepository.findUserById(id).orElse(null);
+    public UserDto findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    @Override
+    public void updateUser(CustomUserDetails userDetails, UserUpdateDto userUpdateDto) {
+        Optional<User> userOptional = userRepository.findUserByEmail(userDetails.getUsername());
+
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("User not found");
+        }
+
+        User user = userOptional.get();
+
+        String avatarFileName = saveFile(userUpdateDto.getAvatar());
+
+        if (userUpdateDto.getUsername() != null && !userUpdateDto.getUsername().isEmpty()) {
+            user.setUsername(userUpdateDto.getUsername());
+        }
+        if (userUpdateDto.getDob() != null) {
+            user.setDob(userUpdateDto.getDob());
+        }
+        if (userUpdateDto.getPhone() != null) {
+            user.setPhone(userUpdateDto.getPhone());
+        }
+
+        if (userUpdateDto.getNewPassword() != null) {
+            if (!passwordEncoder.matches(userUpdateDto.getCurrentPassword(), user.getPassword())) {
+                throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");
+            }
+
+            if (!userUpdateDto.getNewPassword().equals(userUpdateDto.getConfirmPassword())) {
+                throw new IllegalArgumentException("Mật khẩu mới và xác nhận mật khẩu không khớp");
+            }
+            user.setPassword(passwordEncoder.encode(userUpdateDto.getNewPassword()));
+        }
+
+        if (avatarFileName != null && !avatarFileName.isEmpty()) {
+            user.setAvatar(avatarFileName);
+        }
+
+        userRepository.save(user);
+    }
+
+    private String saveFile(MultipartFile multipartFile) {
+        if (multipartFile == null || multipartFile.isEmpty()) {
+            return null;
+        }
+        String fileName = multipartFile.getOriginalFilename();
+        try {
+            FileCopyUtils.copy(multipartFile.getBytes(), new File(fileUpload + fileName));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return fileName;
     }
 
     public User findByEmail(String email) {

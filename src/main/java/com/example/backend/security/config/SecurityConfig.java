@@ -65,6 +65,7 @@ public class SecurityConfig {
                 }))
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(res -> res.requestMatchers("/api/v1/public/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/user/**").hasAnyRole("ADMIN","USER")
                         .requestMatchers("/api/v1/moderator").hasAnyRole("ADMIN","MODERATOR")
