@@ -16,4 +16,5 @@ public interface IUserService {
     UserDto findUserByEmail(String email);
 
     void updateUser(CustomUserDetails userDetails, UserUpdateDto userUpdateDto);
+    ResponseSuccess deleteUserById(Long id);
 }
