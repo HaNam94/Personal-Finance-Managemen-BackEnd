@@ -15,6 +15,8 @@ import com.example.backend.repository.IUserRepo;
 import com.example.backend.security.jwt.JWTProvider;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IUserService;
+import com.example.backend.util.EmailUtil;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,18 +35,20 @@ import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements IUserService {
-    private final IUserRepo userRepository;
+    private final IUserRepo IUserRepository;
     private final IRoleRepo roleRepository;
 //    private final UserGenericMapperImpl genericMapperImpl;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final JWTProvider jwtProvider;
+    private final EmailUtil emailUtil;
 
     @Value("${upload.path}")
     private String fileUpload;
@@ -75,8 +79,13 @@ public class UserServiceImpl implements IUserService {
         if (map.size() > 0) {
             throw new CustomValidationException(map);
         }
-
-
+        String otpCode = generateRandomString(6);
+        try {
+            emailUtil.sendOtpEmail(formRegister.getEmail(), otpCode, formRegister.getUsername());
+        } catch (MessagingException e) {
+            map.put("otpCode", "Co loi trong qua trinh gui email");
+            throw new CustomValidationException(map);
+        }
         User user = User.builder()
                 .username(formRegister.getUsername())
                 .email(formRegister.getEmail())
@@ -86,20 +95,50 @@ public class UserServiceImpl implements IUserService {
                 .isAccountGoogle(false)
                 .isDelete(false)
                 .userStatus(true)
-                .otpCodeVerifed(false)
+                .isActive(false)
                 .build();
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
         user.setRoles(roles);
 
         //        user.setOtpCode(generateUUID());
-        user.setOtpCode(generateRandomString(6));
-        userRepository.save(user);
+        user.setOtpCode(otpCode);
+        IUserRepository.save(user);
         ResponseSuccess response = ResponseSuccess.builder()
                 .message("DK OK")
                 .build();
         return response;
 
+    }
+
+    public String verifyAccount(String email, String otp) {
+
+
+        User user = IUserRepository.findUserByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
+//        if (user.getOtpCode().equals(otp) && Duration.between(user.getOtpGenerateTime(),
+//                LocalDateTime.now()).getSeconds() < (1 * 60)) {
+            user.setIsActive(true);
+            IUserRepository.save(user);
+            return "OTP verified you can login";
+//        }
+//        return "Please regenerate otp and try again";
+    }
+
+    public String regenerateOtp(String email) {
+        User user = IUserRepository.findUserByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
+        String otp = generateRandomString(6);
+
+        try {
+            emailUtil.sendOtpEmail(email, otp, user.getUsername());
+        } catch (MessagingException e) {
+            throw new RuntimeException("Unable to send otp please try again");
+        }
+        user.setOtpCode(otp);
+        user.setOtpGenerateTime(LocalDateTime.now());
+        IUserRepository.save(user);
+        return "Email sent... please verify account within 1 minute";
     }
 
 
@@ -112,8 +151,8 @@ public class UserServiceImpl implements IUserService {
             errMap.put("user", "Tai khoan khong ton tai");
             throw new CustomValidationException(errMap);
         }
-        if (!user.getOtpCodeVerifed()){
-            errMap.put("otpCodeVerifed", "Tai khoan chua active");
+        if (!user.getIsActive()){
+            errMap.put("isActive", "Tai khoan chua active");
             throw new CustomValidationException(errMap);
         }
 
@@ -131,7 +170,7 @@ public class UserServiceImpl implements IUserService {
                 .email(user.getEmail())
                 .userStatus(user.getUserStatus())
                 .phone(user.getPhone())
-                .birthday(user.getDob())
+                .dob(user.getDob())
                 .avatar(user.getAvatar())
                 .fullName(user.getUsername())
                 .isDelete(user.getIsDelete())
@@ -143,12 +182,12 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserDto findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return IUserRepository.findByEmail(email).orElse(null);
     }
 
     @Override
     public void updateUser(CustomUserDetails userDetails, UserUpdateDto userUpdateDto) {
-        Optional<User> userOptional = userRepository.findUserByEmail(userDetails.getUsername());
+        Optional<User> userOptional = IUserRepository.findUserByEmail(userDetails.getUsername());
 
         if (userOptional.isEmpty()) {
             throw new NotFoundException("User not found");
@@ -183,7 +222,7 @@ public class UserServiceImpl implements IUserService {
             user.setAvatar(avatarFileName);
         }
 
-        userRepository.save(user);
+        IUserRepository.save(user);
     }
 
     private String saveFile(MultipartFile multipartFile) {
@@ -200,7 +239,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public User findByEmail(String email) {
-        return userRepository.findUserByEmail(email).orElse(null);
+        return IUserRepository.findUserByEmail(email).orElse(null);
     }
 
     public Boolean checkIsExistEmail(String email) {
@@ -212,7 +251,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public Boolean checkIsExistPhone(String phone) {
-        User user = userRepository.findUserByPhone(phone).orElse(null);
+        User user = IUserRepository.findUserByPhone(phone).orElse(null);
         if (user == null) {
             return false;
         }
@@ -229,7 +268,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public Boolean checkEmailAndPassword(String email, String pass) {
-        User user = userRepository.findUserByEmailAndPassword(email, pass).orElse(null);
+        User user = IUserRepository.findUserByEmailAndPassword(email, pass).orElse(null);
         if (user == null) {
             return false;
         }

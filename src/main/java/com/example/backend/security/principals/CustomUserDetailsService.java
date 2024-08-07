@@ -18,12 +18,12 @@ import java.util.Set;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
-    private IUserRepo userRepository;
+    private IUserRepo IUserRepository;
 
     // chuyen doi user thanh UserDetail trong security
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new NoSuchElementException("Email khong ton tai"));
+        User user = IUserRepository.findUserByEmail(email).orElseThrow(() -> new NoSuchElementException("Email khong ton tai"));
         return CustomUserDetails.builder()
                 .status(user.getUserStatus())
                 .email(user.getEmail())

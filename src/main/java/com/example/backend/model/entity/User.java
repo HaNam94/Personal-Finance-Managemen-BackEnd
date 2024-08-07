@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -25,8 +26,9 @@ public class User {
     private Boolean isAccountGoogle;
     private Boolean isDelete;
     private Boolean userStatus;
+    private Boolean isActive;
     private String otpCode;
-    private Boolean otpCodeVerifed;
+    private LocalDateTime otpGenerateTime;
     private String resetToken;
     private String resetTokenValidAt;
     @ManyToMany(fetch = FetchType.EAGER)
