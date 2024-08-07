@@ -12,13 +12,18 @@ import org.springframework.validation.BindingResult;
 
 public interface IUserService {
     ResponseSuccess register(FormRegister formRegister, BindingResult bindingResult);
-    ResponseUser login(FormLogin formLogin, BindingResult bindingResult) ;
+
+    ResponseUser login(FormLogin formLogin, BindingResult bindingResult);
 
     UserDto findUserByEmail(String email);
 
     void updateUser(CustomUserDetails userDetails, UserUpdateDto userUpdateDto);
 
+    ResponseSuccess deleteUserById(Long id);
+
+
     void save(User user);
 
     User findByResetToken(String token);
+
 }
