@@ -11,10 +11,10 @@ import com.example.backend.exception.NotFoundException;
 import com.example.backend.model.entity.Role;
 import com.example.backend.model.entity.User;
 import com.example.backend.repository.IRoleRepo;
-import com.example.backend.repository.UserRepo;
+import com.example.backend.repository.IUserRepo;
 import com.example.backend.security.jwt.JWTProvider;
 import com.example.backend.security.principals.CustomUserDetails;
-import com.example.backend.service.UserService;
+import com.example.backend.service.IUserService;
 import com.example.backend.util.EmailUtil;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +41,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UserService {
-    private final UserRepo userRepository;
+public class UserServiceImpl implements IUserService {
+    private final IUserRepo IUserRepository;
     private final IRoleRepo roleRepository;
 //    private final UserGenericMapperImpl genericMapperImpl;
     private final AuthenticationManager authenticationManager;
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
 
         //        user.setOtpCode(generateUUID());
         user.setOtpCode(otpCode);
-        userRepository.save(user);
+        IUserRepository.save(user);
         ResponseSuccess response = ResponseSuccess.builder()
                 .message("DK OK")
                 .build();
@@ -114,19 +114,19 @@ public class UserServiceImpl implements UserService {
     public String verifyAccount(String email, String otp) {
 
 
-        User user = userRepository.findUserByEmail(email)
+        User user = IUserRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
 //        if (user.getOtpCode().equals(otp) && Duration.between(user.getOtpGenerateTime(),
 //                LocalDateTime.now()).getSeconds() < (1 * 60)) {
             user.setIsActive(true);
-            userRepository.save(user);
+            IUserRepository.save(user);
             return "OTP verified you can login";
 //        }
 //        return "Please regenerate otp and try again";
     }
 
     public String regenerateOtp(String email) {
-        User user = userRepository.findUserByEmail(email)
+        User user = IUserRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
         String otp = generateRandomString(6);
 
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setOtpCode(otp);
         user.setOtpGenerateTime(LocalDateTime.now());
-        userRepository.save(user);
+        IUserRepository.save(user);
         return "Email sent... please verify account within 1 minute";
     }
 
@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .userStatus(user.getUserStatus())
                 .phone(user.getPhone())
-                .birthday(user.getDob())
+                .dob(user.getDob())
                 .avatar(user.getAvatar())
                 .fullName(user.getUsername())
                 .isDelete(user.getIsDelete())
@@ -182,12 +182,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return IUserRepository.findByEmail(email).orElse(null);
     }
 
     @Override
     public void updateUser(CustomUserDetails userDetails, UserUpdateDto userUpdateDto) {
-        Optional<User> userOptional = userRepository.findUserByEmail(userDetails.getUsername());
+        Optional<User> userOptional = IUserRepository.findUserByEmail(userDetails.getUsername());
 
         if (userOptional.isEmpty()) {
             throw new NotFoundException("User not found");
@@ -222,7 +222,7 @@ public class UserServiceImpl implements UserService {
             user.setAvatar(avatarFileName);
         }
 
-        userRepository.save(user);
+        IUserRepository.save(user);
     }
 
     private String saveFile(MultipartFile multipartFile) {
@@ -239,7 +239,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public User findByEmail(String email) {
-        return userRepository.findUserByEmail(email).orElse(null);
+        return IUserRepository.findUserByEmail(email).orElse(null);
     }
 
     public Boolean checkIsExistEmail(String email) {
@@ -251,7 +251,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Boolean checkIsExistPhone(String phone) {
-        User user = userRepository.findUserByPhone(phone).orElse(null);
+        User user = IUserRepository.findUserByPhone(phone).orElse(null);
         if (user == null) {
             return false;
         }
@@ -268,7 +268,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Boolean checkEmailAndPassword(String email, String pass) {
-        User user = userRepository.findUserByEmailAndPassword(email, pass).orElse(null);
+        User user = IUserRepository.findUserByEmailAndPassword(email, pass).orElse(null);
         if (user == null) {
             return false;
         }

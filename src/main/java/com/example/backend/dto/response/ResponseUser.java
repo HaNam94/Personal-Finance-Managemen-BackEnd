@@ -17,7 +17,7 @@ public class ResponseUser {
     private String avatar;
     private String fullName;
     private String phone;
-    private LocalDate birthday;
+    private LocalDate dob;
     private String otpCode;
     private Boolean isDelete;
     private Collection<? extends GrantedAuthority> authorities;

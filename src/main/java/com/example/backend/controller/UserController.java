@@ -1,12 +1,10 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.UserDto;
-import com.example.backend.service.UserService;
-import lombok.RequiredArgsConstructor;
 import com.example.backend.dto.UserUpdateDto;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,7 +23,7 @@ import java.util.Map;
 public class UserController {
 
 
-    private final UserService userService;
+    private final IUserService userService;
 
     @GetMapping("/me")
     private ResponseEntity<UserDto> findById(
