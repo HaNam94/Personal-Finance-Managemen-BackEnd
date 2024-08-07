@@ -7,5 +7,7 @@ import com.example.backend.security.principals.CustomUserDetails;
 
 public interface IWalletService {
     ResponseSuccess saveWallet(WalletDto wallet, CustomUserDetails customUserDetails);
+    ResponseSuccess updateWallet(Long id, WalletDto walletDto);
+    WalletDto findWalletById(Long id);
     void deleteWalletByID(Long id);
 }

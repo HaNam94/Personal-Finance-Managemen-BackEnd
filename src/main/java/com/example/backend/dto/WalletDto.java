@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class WalletDto {
+    private Long id;
     @NotNull(message = ValidationMessage.NOT_NULL)
     private String walletName;
     @NotNull(message = ValidationMessage.NOT_NULL)
