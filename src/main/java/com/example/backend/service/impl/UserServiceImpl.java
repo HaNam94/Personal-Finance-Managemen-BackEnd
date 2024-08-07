@@ -106,13 +106,12 @@ public class UserServiceImpl implements IUserService {
 
         User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
-//        if (user.getOtpCode().equals(otp) && Duration.between(user.getOtpGenerateTime(),
-//                LocalDateTime.now()).getSeconds() < (1 * 60)) {
+        if (user.getOtpCode().equals(otp)) {
             user.setIsActive(true);
             userRepository.save(user);
             return "OTP verified you can login";
-//        }
-//        return "Please regenerate otp and try again";
+        }
+        throw new RuntimeException("Invalid OTP");
     }
 
     public String regenerateOtp(String email) {
@@ -187,6 +186,12 @@ public class UserServiceImpl implements IUserService {
 
         if (userUpdateDto.getUsername() != null && !userUpdateDto.getUsername().isEmpty()) {
             user.setUsername(userUpdateDto.getUsername());
+        }
+        if (userUpdateDto.getDob() != null) {
+            user.setDob(userUpdateDto.getDob());
+        }
+        if (userUpdateDto.getPhone() != null) {
+            user.setPhone(userUpdateDto.getPhone());
         }
 
         if (userUpdateDto.getNewPassword() != null) {
