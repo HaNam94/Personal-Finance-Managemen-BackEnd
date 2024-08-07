@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,7 +42,7 @@ public class WalletServiceImpl implements IWalletService {
                 .build();
         Set<User> users = new HashSet<>();
         Set<Role> roles = new HashSet<>();
-        Role role = roleRepository.findRolesByRoleName(String.valueOf(RoleName.ROLE_USER));
+        Role role = roleRepository.findRolesByRoleName(String.valueOf(RoleName.ROLE_USER)).orElseThrow(()->new RuntimeException("Role not found"));
         users.add(user);
         roles.add(role);
         wallet.setUsers(users);
@@ -86,5 +87,26 @@ public class WalletServiceImpl implements IWalletService {
     @Override
     public void deleteWalletByID(Long id) {
         walletRepository.deleteWalletByID(id);
+    }
+
+    @Override
+    public void updateWalletAmount(Long id, WalletDto walletDto) {
+        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        BigDecimal newAmount = wallet.getAmount().add(walletDto.getAmount());
+        walletRepository.updateWalletAmount(id,newAmount);
+
+    }
+
+    @Override
+    public void shareWallet(Long id, String email, String roleName) {
+        User user = userRepository.findUserByEmail(email).orElseThrow(()->new RuntimeException("User not found"));
+        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        Set<User> users = wallet.getUsers();
+        users.add(user);
+        wallet.setUsers(users);
+        Set<Role> roles = wallet.getRoles();
+        roles.add(roleRepository.findRolesByRoleName(roleName).orElseThrow(()-> new RuntimeException("Role not found")));
+        wallet.setRoles(roles);
+        walletRepository.save(wallet);
     }
 }
