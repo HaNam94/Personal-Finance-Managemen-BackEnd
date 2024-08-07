@@ -2,7 +2,7 @@ package com.example.backend.security.principals;
 
 import com.example.backend.model.entity.Role;
 import com.example.backend.model.entity.User;
-import com.example.backend.repository.IUserRepo;
+import com.example.backend.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,7 +18,7 @@ import java.util.Set;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
-    private IUserRepo userRepository;
+    private UserRepo userRepository;
 
     // chuyen doi user thanh UserDetail trong security
     @Override

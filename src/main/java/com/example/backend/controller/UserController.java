@@ -1,18 +1,19 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.UserDto;
-import com.example.backend.service.IUserService;
-import com.example.backend.service.impl.UserServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
 @CrossOrigin("*")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private IUserService userService;
+
+
+    private final UserService userService;
 
     @GetMapping("/{id}")
     private ResponseEntity<UserDto> findById(@PathVariable Long id) {
