@@ -1,6 +1,7 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.WalletDto;
+import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.model.RoleName;
 import com.example.backend.model.entity.Role;
@@ -109,5 +110,10 @@ public class WalletServiceImpl implements IWalletService {
         Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
         wallet.setWalletRole(roleName);
         walletRepository.save(wallet);
+    }
+
+    @Override
+    public Set<WalletInfoDto> findAllWalletByUserId(Long id) {
+        return walletRepository.findAllWalletByUserId(id);
     }
 }
