@@ -117,7 +117,7 @@ public class AuthController {
         String newPassword = request.getNewPassword();
         User user = userService.findByResetToken(token);
         if (user == null) {
-            return "Token không hợp lệ!";
+            throw new RuntimeException("Token đã hết hạn");
         }
 
         // Mã hóa mật khẩu trước khi lưu
