@@ -73,7 +73,7 @@ public class AuthController {
 
         String resetPasswordLink = "http://localhost:3000/reset-password?token=" + token;
         try {
-            sendEmail(email, resetPasswordLink);
+            sendEmail(email, resetPasswordLink, user.getUsername());
         } catch (MessagingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi khi gửi email!");
         }
@@ -81,7 +81,7 @@ public class AuthController {
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
-    private void sendEmail(String email, String resetPasswordLink) throws MessagingException {
+    private void sendEmail(String email, String resetPasswordLink, String username) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -90,7 +90,7 @@ public class AuthController {
                 + "<div style='padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa;'>"
                 + "<h2 style='text-align: center; color: #007bff;'>Khôi phục mật khẩu</h2>"
                 + "<div style='border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; background-color: white;'>"
-                + "<p>Chào bạn,</p>"
+                + "<p>Chào " + username + ",</p>"
                 + "<p>Bạn đã yêu cầu khôi phục mật khẩu. Vui lòng nhấn vào nút dưới đây để đặt lại mật khẩu của bạn:</p>"
                 + "<div style='text-align: center; margin: 20px 0;'>"
                 + "<a href=\"" + resetPasswordLink + "\" style='display: inline-block; padding: 12px 24px; font-size: 16px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;'>"
