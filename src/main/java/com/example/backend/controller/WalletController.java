@@ -1,9 +1,11 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.UserDto;
 import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.model.entity.Wallet;
 import com.example.backend.security.principals.CustomUserDetails;
+import com.example.backend.service.IUserService;
 import com.example.backend.service.IWalletService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +22,21 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/vi/public/wallet")
+@RequestMapping("/api/v1/wallets")
 @RequiredArgsConstructor
 public class WalletController {
     private final IWalletService walletService;
+    private final IUserService userService;
+
+
+    @GetMapping("")
+    public ResponseEntity<?> getAllWallets(
+            Authentication authentication
+    ) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserDto userDto = userService.findUserByEmail(userDetails.getUsername());
+        return new ResponseEntity<>(walletService.findAllWalletByUserId(userDto.getId()), HttpStatus.OK);
+    }
 
     @GetMapping
     public ResponseEntity<?> findAll(){
