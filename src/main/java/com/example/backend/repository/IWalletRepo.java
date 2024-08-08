@@ -22,4 +22,7 @@ public interface IWalletRepo extends JpaRepository<Wallet,Long> {
 
     @Query("SELECT CASE WHEN COUNT(wr) > 0 THEN TRUE ELSE FALSE END FROM WalletUserRole wr WHERE wr.wallet.id = :walletId AND wr.user.id = :userId AND wr.role = 'OWNER'")
     boolean isOwner(@Param("walletId") Long walletId, @Param("userId") Long userId);
+
+    @Query(value = "delete from transaction where id = :id", nativeQuery = true)
+    void deleteTransactionById(Long id);
 }
