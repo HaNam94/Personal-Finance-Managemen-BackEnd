@@ -1,6 +1,5 @@
 package com.example.backend.repository;
 
-import com.example.backend.dto.TransactionDto;
 import com.example.backend.model.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

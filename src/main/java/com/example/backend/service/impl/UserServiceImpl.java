@@ -2,7 +2,6 @@ package com.example.backend.service.impl;
 
 import com.example.backend.dto.UserDto;
 import com.example.backend.dto.UserUpdateDto;
-import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.request.FormLogin;
 import com.example.backend.dto.request.FormRegister;
 import com.example.backend.dto.response.ResponseSuccess;
@@ -65,15 +64,7 @@ public class UserServiceImpl implements IUserService {
             map.put("email", "Email da ton tai");
 
         }
-        if (checkIsExistPhone(formRegister.getPhone())) {
 
-            map.put("phone", "So dien thoai da ton tai");
-
-        }
-        if (!checkBirthdayBeforeEighteenYearAgo(formRegister.getDob())) {
-
-            map.put("dob", "Ban chua du 18 tuoi");
-        }
         if (bindingResult.hasErrors()) {
             for (FieldError err : bindingResult.getFieldErrors()) {
                 map.put(err.getField(), err.getDefaultMessage());
@@ -93,15 +84,13 @@ public class UserServiceImpl implements IUserService {
                 .username(formRegister.getUsername())
                 .email(formRegister.getEmail())
                 .password(passwordEncoder.encode(formRegister.getPassword()))
-                .dob(formRegister.getDob())
-                .phone(formRegister.getPhone())
                 .isAccountGoogle(false)
                 .isDelete(false)
                 .userStatus(true)
                 .isActive(false)
                 .build();
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findRolesByRoleName("ROLE_USER"));
+        roles.add(roleRepository.findRolesByRoleName("ROLE_USER").orElseThrow(()-> new RuntimeException("Role not found")));
         user.setRoles(roles);
         user.setOtpCode(otpCode);
         userRepository.save(user);
@@ -117,13 +106,12 @@ public class UserServiceImpl implements IUserService {
 
         User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
-//        if (user.getOtpCode().equals(otp) && Duration.between(user.getOtpGenerateTime(),
-//                LocalDateTime.now()).getSeconds() < (1 * 60)) {
+        if (user.getOtpCode().equals(otp)) {
             user.setIsActive(true);
             userRepository.save(user);
             return "OTP verified you can login";
-//        }
-//        return "Please regenerate otp and try again";
+        }
+        throw new RuntimeException("Invalid OTP");
     }
 
     public String regenerateOtp(String email) {
@@ -170,8 +158,6 @@ public class UserServiceImpl implements IUserService {
         ResponseUser responseUser = ResponseUser.builder()
                 .email(user.getEmail())
                 .userStatus(user.getUserStatus())
-                .phone(user.getPhone())
-                .dob(user.getDob())
                 .avatar(user.getAvatar())
                 .fullName(user.getUsername())
                 .isDelete(user.getIsDelete())
@@ -287,10 +273,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     public Boolean checkIsExistPhone(String phone) {
-        User user = userRepository.findUserByPhone(phone).orElse(null);
-        if (user == null) {
-            return false;
-        }
+//        User user = userRepository.findUserByPhone(phone).orElse(null);
+//        if (user == null) {
+//            return false;
+//        }
         return true;
     }
 

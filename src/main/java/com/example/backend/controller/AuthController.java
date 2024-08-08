@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -49,6 +50,15 @@ public class AuthController {
         ResponseSuccess responseSuccess = userService.register(formRegister, result);
             return new ResponseEntity<>(responseSuccess, HttpStatus.OK);
 
+    }
+    @PutMapping("/public/verify-account")
+    public ResponseEntity<String> verifyAccount(@RequestParam String email,
+                                                @RequestParam String otp) {
+        return new ResponseEntity<>(userService.verifyAccount(email, otp), HttpStatus.OK);
+    }
+    @PutMapping("/public/regenerate-otp")
+    public ResponseEntity<String> regenerateOtp(@RequestParam String email) {
+        return new ResponseEntity<>(userService.regenerateOtp(email), HttpStatus.OK);
     }
     @PostMapping("/public/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestParam String email) {
@@ -117,6 +127,14 @@ public class AuthController {
         userService.save(user);
 
         return "Mật khẩu đã được đặt lại thành công!";
+    }
+
+    @PostMapping("/public/verify")
+    public ResponseEntity<?> verify(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String otp = request.get("otp");
+        String responseUser =  userService.verifyAccount(email, otp);
+        return new ResponseEntity<>(responseUser, HttpStatus.OK);
     }
 
 }
