@@ -7,6 +7,8 @@ import com.example.backend.dto.response.ResponseUser;
 import com.example.backend.model.entity.ResetPasswordRequest;
 import com.example.backend.model.entity.User;
 import com.example.backend.service.impl.UserServiceImpl;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -69,16 +72,42 @@ public class AuthController {
         userService.save(user);
 
         String resetPasswordLink = "http://localhost:3000/reset-password?token=" + token;
-        sendEmail(email, resetPasswordLink);
+        try {
+            sendEmail(email, resetPasswordLink);
+        } catch (MessagingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi khi gửi email!");
+        }
 
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
-    private void sendEmail(String email, String resetPasswordLink) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("Khôi phục mật khẩu");
-        message.setText("Nhấn vào liên kết dưới đây để đặt lại mật khẩu:\n" + resetPasswordLink);
+    private void sendEmail(String email, String resetPasswordLink) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        String subject = "Khôi phục mật khẩu";
+        String content = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>"
+                + "<div style='padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa;'>"
+                + "<h2 style='text-align: center; color: #007bff;'>Khôi phục mật khẩu</h2>"
+                + "<div style='border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; background-color: white;'>"
+                + "<p>Chào bạn,</p>"
+                + "<p>Bạn đã yêu cầu khôi phục mật khẩu. Vui lòng nhấn vào nút dưới đây để đặt lại mật khẩu của bạn:</p>"
+                + "<div style='text-align: center; margin: 20px 0;'>"
+                + "<a href=\"" + resetPasswordLink + "\" style='display: inline-block; padding: 12px 24px; font-size: 16px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;'>"
+                + "Đặt lại mật khẩu"
+                + "</a>"
+                + "</div>"
+                + "<p>Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này.</p>"
+                + "<p>Trân trọng,</p>"
+                + "<p>Đội ngũ hỗ trợ</p>"
+                + "</div>"
+                + "</div>"
+                + "</div>";
+
+        helper.setTo(email);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
         mailSender.send(message);
     }
 

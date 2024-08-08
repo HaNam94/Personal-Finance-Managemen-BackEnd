@@ -67,9 +67,16 @@ public class UserController {
         userService.updateUser(userDetails, userUpdateDto);
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
-        ResponseSuccess responseSuccess = userService.deleteUserById(id);
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUserById(
+            Authentication authentication
+    ) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserDto userDto = userService.findUserByEmail(userDetails.getUsername());
+        if(userDto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        ResponseSuccess responseSuccess = userService.deleteUserById(userDto.getId());
         return new ResponseEntity<>(responseSuccess.getMessage(),responseSuccess.getStatus());
     }
 

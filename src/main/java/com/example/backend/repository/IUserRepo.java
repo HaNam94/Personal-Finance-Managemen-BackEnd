@@ -18,7 +18,7 @@ public interface IUserRepo extends JpaRepository<User, Long> {
     Optional<User> findUserByEmailAndPassword(String email, String password);
 
     User findByResetToken(String token);
-@Query(value = "select u from user u where email like : email" ,nativeQuery = true)
+//@Query(value = "select u from user u where email like :email" ,nativeQuery = true)
     Optional<UserDto> findByEmail(String email);
 
     @Query(value = "call delete_user(:id)", nativeQuery = true)
