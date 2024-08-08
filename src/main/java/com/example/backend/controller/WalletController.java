@@ -55,7 +55,7 @@ public class WalletController {
         return new ResponseEntity<>(response.getMessage(), response.getStatus());
     }
 
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity<?> addWallet(@Valid @RequestBody WalletDto walletDto, BindingResult result, Authentication authentication) {
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -73,8 +73,8 @@ public class WalletController {
         return new ResponseEntity<>(walletService.findWalletById(id), HttpStatus.OK);
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<?> updateWallet(@PathVariable Long id, @Valid @RequestBody WalletDto walletDto, BindingResult result) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateWallet(@PathVariable Long id, @Valid @ModelAttribute WalletDto walletDto, BindingResult result) {
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : result.getFieldErrors()) {

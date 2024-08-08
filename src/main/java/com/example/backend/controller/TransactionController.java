@@ -32,8 +32,8 @@ public class TransactionController {
         return ResponseEntity.ok().body(transactionDto);
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<?> updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTransaction(@PathVariable Long id, @Valid @ModelAttribute TransactionDto transactionDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
