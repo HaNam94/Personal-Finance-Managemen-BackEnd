@@ -22,4 +22,11 @@ public class Category {
     private String note;
 // 1 la thu, 0 la chi
    private Integer categoryType;
+
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isDefault = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
