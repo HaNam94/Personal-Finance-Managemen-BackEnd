@@ -213,22 +213,22 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public ResponseSuccess deleteUserById(Long id) {
-        List<Wallet> wallets = walletRepository.findAllByUserId(id);
-        wallets.forEach(wallet -> {
-            List<Transaction> transactions = transactionRepository.getTransactionsByWalletId(wallet.getId());
-            transactions.forEach(transaction -> {
-                transactionRepository.deleteTransactionById(transaction.getId());
-            });
-            walletRepository.deleteWalletByID(wallet.getId());
-
-        });
-
-        List<Budget> budgets = budgetRepository.getBudgetsByUserId(id);
-        budgets.forEach(budget -> {
-            budgetRepository.deleteBudgetById(budget.getId());
-        });
-
-        userRepository.deleteUserById(id);
+//        List<Wallet> wallets = walletRepository.findAllByUserId(id);
+//        wallets.forEach(wallet -> {
+//            List<Transaction> transactions = transactionRepository.getTransactionsByWalletId(wallet.getId());
+//            transactions.forEach(transaction -> {
+//                transactionRepository.deleteTransactionById(transaction.getId());
+//            });
+//            walletRepository.deleteWalletByID(wallet.getId());
+//
+//        });
+//
+//        List<Budget> budgets = budgetRepository.getBudgetsByUserId(id);
+//        budgets.forEach(budget -> {
+//            budgetRepository.deleteBudgetById(budget.getId());
+//        });
+//
+//        userRepository.deleteUserById(id);
         ResponseSuccess responseSuccess = new ResponseSuccess();
         responseSuccess.setMessage("Delete success");
         responseSuccess.setStatus(HttpStatus.OK);
