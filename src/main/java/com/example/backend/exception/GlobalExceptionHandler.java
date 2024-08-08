@@ -43,4 +43,11 @@ public class GlobalExceptionHandler {
         error.put("message", "An unexpected error occurred");
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(CustomValidationException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(CustomValidationException e) {
+        System.out.println(e.getErrors());
+        System.out.println("================");
+        return new ResponseEntity<>(e.getErrors(), HttpStatus.BAD_REQUEST);
+    }
 }
