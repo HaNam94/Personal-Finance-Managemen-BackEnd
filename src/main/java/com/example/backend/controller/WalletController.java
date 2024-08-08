@@ -49,7 +49,7 @@ public class WalletController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getWalletById(@PathVariable Long id) {
-       return new ResponseEntity<>(walletService.findWalletById(id), HttpStatus.OK);
+        return new ResponseEntity<>(walletService.findWalletById(id), HttpStatus.OK);
     }
 
     @PostMapping("/{id}")
@@ -80,8 +80,8 @@ public class WalletController {
 
     @GetMapping("/share-wallet")
     public ResponseEntity<?> getShareWallet(@RequestParam("walletid") Long id
-                                            ,@RequestParam("email") String email
-                                            ,@RequestParam("roleName") String roleName) {
+            ,@RequestParam("email") String email
+            ,@RequestParam("roleName") String roleName) {
         walletService.shareWallet(id,email,roleName);
         return new ResponseEntity<>(HttpStatus.OK);
     }
