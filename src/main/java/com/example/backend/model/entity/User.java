@@ -25,6 +25,8 @@ public class User {
     private LocalDate dob;
     private Boolean isAccountGoogle;
     private Boolean isDelete;
+    private LocalDate dob;
+    private String phone;
     private Boolean userStatus;
     private Boolean isActive;
     private String otpCode;

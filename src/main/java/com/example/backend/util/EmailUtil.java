@@ -31,7 +31,7 @@ public class EmailUtil {
                             
                             <p>Để hoàn tất quá trình đăng ký và kích hoạt tài khoản của bạn, vui lòng nhấp vào liên kết dưới đây để xác thực địa chỉ email của bạn:</p>
                             
-                            <p><a href="http://localhost:8080/verify-account?email=%s&otp=%s" target="_blank">Xác Thực Tài Khoản</a></p>
+                            <p><a href="http://localhost:3000/verify-account?email=%s&otp=%s" target="_blank">Xác Thực Tài Khoản</a></p>
                             
                             <p> Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email này và không có hành động nào khác cần thiết.</p>
                            

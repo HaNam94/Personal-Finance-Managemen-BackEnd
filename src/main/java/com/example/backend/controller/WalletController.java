@@ -49,7 +49,7 @@ public class WalletController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getWalletById(@PathVariable Long id) {
-       return new ResponseEntity<>(walletService.findWalletById(id), HttpStatus.OK);
+        return new ResponseEntity<>(walletService.findWalletById(id), HttpStatus.OK);
     }
 
     @PostMapping("/{id}")
