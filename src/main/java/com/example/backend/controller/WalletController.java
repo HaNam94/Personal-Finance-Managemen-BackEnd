@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,6 +24,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WalletController {
     private final IWalletService walletService;
+
+    @GetMapping
+    public ResponseEntity<?> findAll(){
+     List<Wallet> wallets =  walletService.findAll();
+     return new ResponseEntity<>(wallets, HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Long id) {

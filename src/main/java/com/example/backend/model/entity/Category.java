@@ -20,15 +20,6 @@ public class Category {
     private String categoryName;
     private String icon;
     private String note;
-
-    @OneToMany(mappedBy = "categories")
-    private Collection<Transaction> transaction;
-
-    public Collection<Transaction> getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Collection<Transaction> transaction) {
-        this.transaction = transaction;
-    }
+    // 1 la thu(incomes) - 0 la chi(expenses)
+    private Integer categoryType;
 }

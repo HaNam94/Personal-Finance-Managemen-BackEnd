@@ -273,10 +273,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     public Boolean checkIsExistPhone(String phone) {
-//        User user = userRepository.findUserByPhone(phone).orElse(null);
-//        if (user == null) {
-//            return false;
-//        }
+        User user = userRepository.findUserByPhone(phone).orElse(null);
+        if (user == null) {
+            return false;
+        }
         return true;
     }
 

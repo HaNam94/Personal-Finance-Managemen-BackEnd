@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -31,7 +32,7 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public ResponseSuccess saveWallet(WalletDto walletDto, CustomUserDetails customUserDetails) {
-        User user = userRepository.findUserByEmail(customUserDetails.getEmail()).orElseThrow(()->new RuntimeException("User not found"));
+        User user = userRepository.findUserByEmail(customUserDetails.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
         Wallet wallet = Wallet.builder()
                 .walletName(walletDto.getWalletName())
                 .icon(walletDto.getIcon())
@@ -52,7 +53,7 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public ResponseSuccess updateWallet(Long id, WalletDto walletDto) {
-        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        Wallet wallet = walletRepository.findById(id).orElseThrow(() -> new RuntimeException("Wallet not found"));
         wallet.setWalletName(walletDto.getWalletName());
         wallet.setCurrency(walletDto.getCurrency());
         wallet.setAmount(walletDto.getAmount());
@@ -68,7 +69,7 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public WalletDto findWalletById(Long id) {
-        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        Wallet wallet = walletRepository.findById(id).orElseThrow(() -> new RuntimeException("Wallet not found"));
         WalletDto walletDto = WalletDto.builder()
                 .walletName(wallet.getWalletName())
                 .icon(wallet.getIcon())
@@ -87,16 +88,16 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void updateWalletAmount(Long id, WalletDto walletDto) {
-        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        Wallet wallet = walletRepository.findById(id).orElseThrow(() -> new RuntimeException("Wallet not found"));
         BigDecimal newAmount = wallet.getAmount().add(walletDto.getAmount());
-        walletRepository.updateWalletAmount(id,newAmount);
+        walletRepository.updateWalletAmount(id, newAmount);
 
     }
 
     @Override
     public void shareWallet(Long id, String email, String roleName) {
-        User user = userRepository.findUserByEmail(email).orElseThrow(()->new RuntimeException("User not found"));
-        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        Wallet wallet = walletRepository.findById(id).orElseThrow(() -> new RuntimeException("Wallet not found"));
         Set<User> users = wallet.getUsers();
         users.add(user);
         wallet.setUsers(users);
@@ -105,9 +106,18 @@ public class WalletServiceImpl implements IWalletService {
     }
 
     @Override
-    public void addNewWalletRole(Long id,String roleName) {
-        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+    public void addNewWalletRole(Long id, String roleName) {
+        Wallet wallet = walletRepository.findById(id).orElseThrow(() -> new RuntimeException("Wallet not found"));
         wallet.setWalletRole(roleName);
         walletRepository.save(wallet);
+    }
+
+    @Override
+    public List<Wallet> findAll() {
+        List<Wallet> wallets = walletRepository.findAll();
+        if (wallets.isEmpty()) {
+            throw new RuntimeException("No wallets found");
+        }
+        return wallets;
     }
 }

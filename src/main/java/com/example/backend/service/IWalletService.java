@@ -5,6 +5,8 @@ import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.model.entity.Wallet;
 import com.example.backend.security.principals.CustomUserDetails;
 
+import java.util.List;
+
 public interface IWalletService {
     ResponseSuccess saveWallet(WalletDto walletDto, CustomUserDetails customUserDetails);
 
@@ -19,4 +21,6 @@ public interface IWalletService {
     void shareWallet(Long id, String email, String roleName);
 
     void addNewWalletRole(Long id,String roleName);
+
+    List<Wallet> findAll();
 }
