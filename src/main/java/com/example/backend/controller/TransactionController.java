@@ -1,15 +1,21 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.TransactionDto;
+import com.example.backend.dto.UserDto;
+import com.example.backend.model.entity.Transaction;
+import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.ITransactionService;
+import com.example.backend.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -17,10 +23,19 @@ import java.util.Map;
 @RequestMapping("/api/v1/user/transaction")
 @RequiredArgsConstructor
 public class TransactionController {
-    private ITransactionService transactionService;
+    private final ITransactionService transactionService;
+    private final IUserService userService;
+
+    @GetMapping("")
+    public  ResponseEntity<?> getAllTransactions(Authentication authentication) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserDto user =  userService.findUserByEmail(customUserDetails.getEmail());
+       List<Transaction> transactions = transactionService.findAllTransactionByUserId(user.getId());
+        return ResponseEntity.ok().body(transactions);
+    }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addTransaction(@Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult) {
+    public ResponseEntity<?> addTransaction(@Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult, Authentication authentication) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
            for (FieldError error : bindingResult.getFieldErrors()) {
@@ -28,7 +43,9 @@ public class TransactionController {
            }
             return ResponseEntity.badRequest().body(errors);
         }
-        transactionService.save(transactionDto);
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserDto user =  userService.findUserByEmail(customUserDetails.getEmail());
+        transactionService.save(user.getId(),transactionDto);
         return ResponseEntity.ok().body(transactionDto);
     }
 

@@ -27,5 +27,5 @@ public interface IWalletService {
 
     Set<WalletInfoDto> findAllWalletByUserId(Long id);
 
-    List<Wallet> findAll();
+
 }

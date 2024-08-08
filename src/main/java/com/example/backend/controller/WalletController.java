@@ -38,11 +38,6 @@ public class WalletController {
         return new ResponseEntity<>(walletService.findAllWalletByUserId(userDto.getId()), HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity<?> findAll(){
-     List<Wallet> wallets =  walletService.findAll();
-     return new ResponseEntity<>(wallets, HttpStatus.OK);
-    }
 
 
     @DeleteMapping("/{id}")

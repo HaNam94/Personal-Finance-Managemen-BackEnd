@@ -25,4 +25,5 @@ public class TransactionDto {
     private Long categoryId;
     @NotNull(message = ValidationMessage.NOT_NULL)
     private Long walletId;
+
 }

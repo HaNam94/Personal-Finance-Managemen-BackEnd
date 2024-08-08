@@ -26,5 +26,7 @@ public class Transaction {
     private Category category;
     @ManyToOne(fetch = FetchType.EAGER)
     private Wallet wallet;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User user;
 
 }

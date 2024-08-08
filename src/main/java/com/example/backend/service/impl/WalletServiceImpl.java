@@ -113,14 +113,6 @@ public class WalletServiceImpl implements IWalletService {
         walletRepository.save(wallet);
     }
 
-    @Override
-    public List<Wallet> findAll() {
-        List<Wallet> wallets = walletRepository.findAll();
-        if (wallets.isEmpty()) {
-            throw new RuntimeException("No wallets found");
-        }
-        return wallets;
-    }
 
     @Override
     public Set<WalletInfoDto> findAllWalletByUserId(Long id) {
