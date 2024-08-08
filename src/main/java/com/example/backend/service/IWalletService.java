@@ -1,20 +1,22 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.WalletDto;
-import com.example.backend.dto.response.ResponseSuccess;
+import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.model.entity.Wallet;
-import com.example.backend.security.principals.CustomUserDetails;
+
+import java.util.Set;
 
 public interface IWalletService {
-    ResponseSuccess saveWallet(WalletDto walletDto, CustomUserDetails customUserDetails);
 
-    ResponseSuccess updateWallet(Long id, WalletDto walletDto);
+    Set<WalletInfoDto> findAllWalletByUserId(Long id);
 
-    WalletDto findWalletById(Long id);
+    Wallet saveWallet(Long id, WalletDto walletDto);
 
-    void deleteWalletByID(Long id);
+    WalletInfoDto getWalletWithPermission(Long id, Long id1);
 
-    void updateWalletAmount(Long id, WalletDto walletDto);
+    boolean isOwner(Long id, Long id1);
 
-    void shareWallet(Long id, String email, String roleName);
+    void updateWallet(Long id, WalletDto walletDto);
+
+    void deleteWallet(Long id);
 }

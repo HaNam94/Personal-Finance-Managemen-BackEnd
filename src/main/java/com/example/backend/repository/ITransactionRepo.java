@@ -9,8 +9,8 @@ import java.util.List;
 
 @Repository
 public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
-    @Query(value = "select tr_w.transaction_id from wallet w join transaction_wallets tr_w on :walletId = tr_w.wallets_id join transaction tr on tr_w.transaction_id = tr.id",nativeQuery = true)
+    @Query(value = "select tr_w.transaction_id from wallet w join  transaction tr on tr_w.wallets_id = :walletId",nativeQuery = true)
     List<Transaction> getTransactionsByWalletId(Long walletId);
-    @Query(value = "call delete_transaction(:id)", nativeQuery = true)
+    @Query(value = "delete from transaction where id = :id", nativeQuery = true)
     void deleteTransactionById(Long id);
 }

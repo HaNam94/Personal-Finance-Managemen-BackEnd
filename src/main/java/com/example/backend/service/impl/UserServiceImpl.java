@@ -8,6 +8,7 @@ import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.dto.response.ResponseUser;
 import com.example.backend.exception.CustomValidationException;
 import com.example.backend.exception.NotFoundException;
+import com.example.backend.exception.UnauthorizedException;
 import com.example.backend.model.entity.*;
 import com.example.backend.repository.*;
 import com.example.backend.security.jwt.JWTProvider;
@@ -60,9 +61,7 @@ public class UserServiceImpl implements IUserService {
 
         Map<String, String> map = new HashMap<>();
         if (checkIsExistEmail(formRegister.getEmail())) {
-
             map.put("email", "Email da ton tai");
-
         }
 
         if (bindingResult.hasErrors()) {
@@ -137,22 +136,21 @@ public class UserServiceImpl implements IUserService {
         Map<String, String> errMap = new HashMap<>();
         System.out.println(checkIsExistEmail(formLogin.getEmail()));
         if (!checkIsExistEmail(formLogin.getEmail())) {
-            errMap.put("user", "Tai khoan khong ton tai");
-            throw new CustomValidationException(errMap);
+            throw new NotFoundException("Tài khoản không tồn tại");
         }
-        if (!user.getIsActive()){
-            errMap.put("isActive", "Tai khoan chua active");
-            throw new CustomValidationException(errMap);
-        }
+
 
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(formLogin.getEmail(), formLogin.getPassword()));
-
         } catch (AuthenticationException e) {
-            errMap.put("emailAndPassword", "Email hoac Password khong dung");
-            throw new CustomValidationException(errMap);
+            throw new UnauthorizedException("Email hoặc mật khẩu không đúng");
         }
+
+        if (!user.getIsActive()){
+            throw new RuntimeException("Tài khoản chưa kích hoạt");
+        }
+
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String accessToken = jwtProvider.generateAccessToken(userDetails);
         ResponseUser responseUser = ResponseUser.builder()
@@ -215,22 +213,22 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public ResponseSuccess deleteUserById(Long id) {
-        List<Wallet> wallets = walletRepository.findAllByUserId(id);
-        wallets.forEach(wallet -> {
-            List<Transaction> transactions = transactionRepository.getTransactionsByWalletId(wallet.getId());
-            transactions.forEach(transaction -> {
-                transactionRepository.deleteTransactionById(transaction.getId());
-            });
-            walletRepository.deleteWalletByID(wallet.getId());
-
-        });
-
-        List<Budget> budgets = budgetRepository.getBudgetsByUserId(id);
-        budgets.forEach(budget -> {
-            budgetRepository.deleteBudgetById(budget.getId());
-        });
-
-        userRepository.deleteUserById(id);
+//        List<Wallet> wallets = walletRepository.findAllByUserId(id);
+//        wallets.forEach(wallet -> {
+//            List<Transaction> transactions = transactionRepository.getTransactionsByWalletId(wallet.getId());
+//            transactions.forEach(transaction -> {
+//                transactionRepository.deleteTransactionById(transaction.getId());
+//            });
+//            walletRepository.deleteWalletByID(wallet.getId());
+//
+//        });
+//
+//        List<Budget> budgets = budgetRepository.getBudgetsByUserId(id);
+//        budgets.forEach(budget -> {
+//            budgetRepository.deleteBudgetById(budget.getId());
+//        });
+//
+//        userRepository.deleteUserById(id);
         ResponseSuccess responseSuccess = new ResponseSuccess();
         responseSuccess.setMessage("Delete success");
         responseSuccess.setStatus(HttpStatus.OK);

@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -21,10 +22,10 @@ public class User {
     private String email;
     private String password;
     private String avatar;
+    private String phone;
+    private LocalDate dob;
     private Boolean isAccountGoogle;
     private Boolean isDelete;
-    private LocalDate dob;
-    private String phone;
     private Boolean userStatus;
     private Boolean isActive;
     private String otpCode;
@@ -33,4 +34,7 @@ public class User {
     private String resetTokenValidAt;
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<WalletUserRole> walletRoles = new HashSet<>();
 }
