@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.UserDto;
 import com.example.backend.dto.WalletDto;
+import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.model.entity.Wallet;
 import com.example.backend.security.principals.CustomUserDetails;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -33,9 +35,44 @@ public class WalletController {
     public ResponseEntity<?> getAllWallets(
             Authentication authentication
     ) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        UserDto userDto = userService.findUserByEmail(userDetails.getUsername());
+        UserDto userDto = getUserDto(authentication);
         return new ResponseEntity<>(walletService.findAllWalletByUserId(userDto.getId()), HttpStatus.OK);
+    }
+
+    @PostMapping("")
+    public ResponseEntity<?> createWallet(
+            Authentication authentication,
+            @Validated @RequestBody WalletDto walletDto
+    ) {
+        UserDto userDto = getUserDto(authentication);
+        walletService.saveWallet(userDto.getId(), walletDto);
+        return new ResponseEntity<>("{}", HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getWallet(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        UserDto userDto = getUserDto(authentication);
+        WalletInfoDto walletDto = walletService.getWalletWithPermission(id, userDto.getId());
+        if (walletDto == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(walletDto, HttpStatus.OK);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateWallet(
+            @PathVariable Long id,
+            @Validated @RequestBody WalletDto walletDto,
+            Authentication authentication
+    ) {
+        UserDto userDto = getUserDto(authentication);
+        if (!walletService.isOwner(id, userDto.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        walletService.updateWallet(id, walletDto);
+        return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
 
@@ -76,35 +113,21 @@ public class WalletController {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> deleteWallet(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        UserDto userDto = getUserDto(authentication);
+        if (!walletService.isOwner(id, userDto.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        ResponseSuccess responseSuccess = walletService.updateWallet(id, walletDto);
-        return new ResponseEntity<>(responseSuccess.getMessage(), responseSuccess.getStatus());
+        walletService.deleteWallet(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/edit-wallet_amount/{id}")
-    public ResponseEntity<?> updateWalletAmount(@PathVariable Long id, @Valid @RequestBody WalletDto walletDto, BindingResult result) {
-        if (result.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : result.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
-        walletService.updateWalletAmount(id,walletDto);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 
-    @GetMapping("/share-wallet")
-    public ResponseEntity<?> getShareWallet(@RequestParam("walletid") Long id
-                                            ,@RequestParam("email") String email
-                                            ,@RequestParam("roleName") String roleName) {
-        walletService.shareWallet(id,email,roleName);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PutMapping("/add-wallet-role")
-    public ResponseEntity<?> addWalletRole(@RequestParam Long walletId,@RequestParam String roleName) {
-        walletService.addNewWalletRole(walletId,roleName);
-        return new ResponseEntity<>(HttpStatus.OK);
+    private UserDto getUserDto(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return userService.findUserByEmail(userDetails.getUsername());
     }
 }
