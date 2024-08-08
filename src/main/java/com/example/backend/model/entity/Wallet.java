@@ -24,7 +24,6 @@ public class Wallet {
     private Boolean walletStatus;
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<User> users;
-    @ManyToMany
-    private Set<Role> roles;
+   private String walletRole;
 
 }

@@ -17,4 +17,6 @@ public interface IWalletService {
     void updateWalletAmount(Long id, WalletDto walletDto);
 
     void shareWallet(Long id, String email, String roleName);
+
+    void addNewWalletRole(Long id,String roleName);
 }

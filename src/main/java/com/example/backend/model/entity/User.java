@@ -21,6 +21,8 @@ public class User {
     private String email;
     private String password;
     private String avatar;
+    private String phone;
+    private LocalDate dob;
     private Boolean isAccountGoogle;
     private Boolean isDelete;
     private Boolean userStatus;

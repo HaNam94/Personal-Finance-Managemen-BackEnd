@@ -41,12 +41,8 @@ public class WalletServiceImpl implements IWalletService {
                 .walletStatus(true)
                 .build();
         Set<User> users = new HashSet<>();
-        Set<Role> roles = new HashSet<>();
-        Role role = roleRepository.findRolesByRoleName(String.valueOf(RoleName.ROLE_USER)).orElseThrow(()->new RuntimeException("Role not found"));
         users.add(user);
-        roles.add(role);
         wallet.setUsers(users);
-        wallet.setRoles(roles);
         walletRepository.save(wallet);
         ResponseSuccess responseSuccess = new ResponseSuccess();
         responseSuccess.setMessage("Successfully saved wallet");
@@ -104,9 +100,14 @@ public class WalletServiceImpl implements IWalletService {
         Set<User> users = wallet.getUsers();
         users.add(user);
         wallet.setUsers(users);
-        Set<Role> roles = wallet.getRoles();
-        roles.add(roleRepository.findRolesByRoleName(roleName).orElseThrow(()-> new RuntimeException("Role not found")));
-        wallet.setRoles(roles);
+        wallet.setWalletRole(roleName);
+        walletRepository.save(wallet);
+    }
+
+    @Override
+    public void addNewWalletRole(Long id,String roleName) {
+        Wallet wallet = walletRepository.findById(id).orElseThrow(()->new RuntimeException("Wallet not found"));
+        wallet.setWalletRole(roleName);
         walletRepository.save(wallet);
     }
 }

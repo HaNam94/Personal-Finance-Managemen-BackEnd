@@ -85,4 +85,10 @@ public class WalletController {
         walletService.shareWallet(id,email,roleName);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/add-wallet-role")
+    public ResponseEntity<?> addWalletRole(@RequestParam Long walletId,@RequestParam String roleName) {
+        walletService.addNewWalletRole(walletId,roleName);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
