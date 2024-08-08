@@ -25,7 +25,7 @@ public class Transaction {
     private LocalDate datetime;
     @ManyToOne
     private Category categories;
-    @ManyToMany
-    private List<Wallet> wallets;
+    @ManyToOne
+    private Wallet wallets;
 
 }
