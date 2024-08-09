@@ -12,9 +12,9 @@ import java.util.Set;
 import java.util.List;
 
 public interface IWalletService {
-    Wallet saveWallet(Long ownerId, WalletDto walletDto);
+    void saveWallet(Long ownerId, WalletDto walletDto);
 
-    Wallet updateWallet(Long walletId, WalletDto walletDto);
+    void updateWallet(Long walletId, WalletDto walletDto);
 
     WalletDto findWalletById(Long id);
 
