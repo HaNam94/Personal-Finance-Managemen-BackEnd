@@ -68,10 +68,8 @@ public class WalletServiceImpl implements IWalletService {
     }
 
     @Override
-    public boolean isOwner(Long id, Long userId) {
-        // TODO: Implement logic to check if user is owner of the wallet,
-        // fix cái này nha quyền owner mới được cập nhật
-        return true;
+    public boolean isOwner(Long walletId, Long userId) {
+        return walletRepo.isOwner(walletId, userId);
     }
 
     @Override

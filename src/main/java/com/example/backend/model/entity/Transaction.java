@@ -19,13 +19,15 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String transactionType;
+    private Integer transactionType;
     private String note;
     private BigDecimal amount;
     private LocalDate datetime;
-    @ManyToOne
-    private Category categories;
-    @ManyToOne
-    private Wallet wallets;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Category category;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Wallet wallet;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User user;
 }
