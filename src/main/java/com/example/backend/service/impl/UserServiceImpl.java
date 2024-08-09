@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.example.backend.dto.UserDto;
 import com.example.backend.dto.UserUpdateDto;
+import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.dto.request.FormLogin;
 import com.example.backend.dto.request.FormRegister;
 import com.example.backend.dto.response.ResponseSuccess;
@@ -213,10 +214,10 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public ResponseSuccess deleteUserById(Long userId) {
-        List<Wallet> wallets = walletRepository.findAllByUserId(userId);
+        Set<WalletInfoDto> wallets = walletRepository.findAllByUserId(userId);
         transactionRepository.deleteTransactionByUserId(userId);
         wallets.forEach(wallet -> {
-            walletRepository.deleteWalletByID(wallet.getId());
+            walletRepository.deleteWalletById(wallet.getId());
         });
 
         List<Budget> budgets = budgetRepository.getBudgetsByUserId(userId);

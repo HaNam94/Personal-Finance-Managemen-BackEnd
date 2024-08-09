@@ -3,7 +3,6 @@ package com.example.backend.dto;
 import com.example.backend.validator.ValidationMessage;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,4 +32,5 @@ public class WalletDto {
     @NotNull(message = ValidationMessage.NOT_NULL)
     @Min(value = 0)
     private BigDecimal amount;
+    private Long walletUserRoleId;
 }

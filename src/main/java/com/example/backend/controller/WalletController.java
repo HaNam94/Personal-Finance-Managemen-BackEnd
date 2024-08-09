@@ -18,6 +18,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,44 +76,15 @@ public class WalletController {
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
+    @PutMapping("/{id}/{newAmount}")
+    public ResponseEntity<?> updateWalletAmount(@PathVariable Long id, @PathVariable BigDecimal newAmount ) {
+        walletService.updateWalletAmount(id,newAmount);
+        return ResponseEntity.ok().build();
+    }
+
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Long id) {
-        // Implement logic to delete wallet with given ID
-        walletService.deleteWalletByID(id);
-        ResponseSuccess response = new ResponseSuccess();
-        response.setMessage("Delete wallet");
-        response.setStatus(HttpStatus.OK);
-        return new ResponseEntity<>(response.getMessage(), response.getStatus());
-    }
-
-    @PostMapping("")
-    public ResponseEntity<?> addWallet(@Valid @RequestBody WalletDto walletDto, BindingResult result, Authentication authentication) {
-        if (result.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : result.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
-        ResponseSuccess responseSuccess = walletService.saveWallet(walletDto, (CustomUserDetails) authentication.getPrincipal());
-        return new ResponseEntity<>(responseSuccess.getMessage(), responseSuccess.getStatus());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getWalletById(@PathVariable Long id) {
-        return new ResponseEntity<>(walletService.findWalletById(id), HttpStatus.OK);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateWallet(@PathVariable Long id, @Valid @ModelAttribute WalletDto walletDto, BindingResult result) {
-        if (result.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : result.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     public ResponseEntity<?> deleteWallet(
             @PathVariable Long id,
             Authentication authentication
@@ -121,8 +93,17 @@ public class WalletController {
         if (!walletService.isOwner(id, userDto.getId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        walletService.deleteWallet(id);
+        walletService.deleteWalletById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/share-wallet/{id}")
+    public ResponseEntity<?> shareWallet(@PathVariable Long walletId
+                                        ,Authentication authentication
+                                        ,String email
+                                        , String walletRoleName){
+        walletService.shareWallet(walletId,email,walletRoleName);
+        return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
 

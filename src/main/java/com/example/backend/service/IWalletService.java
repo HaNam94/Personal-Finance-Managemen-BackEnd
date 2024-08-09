@@ -6,26 +6,29 @@ import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.model.entity.Wallet;
 import com.example.backend.security.principals.CustomUserDetails;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import java.util.List;
 
 public interface IWalletService {
-    ResponseSuccess saveWallet(WalletDto walletDto, CustomUserDetails customUserDetails);
+    Wallet saveWallet(Long ownerId, WalletDto walletDto);
 
-    ResponseSuccess updateWallet(Long id, WalletDto walletDto);
+    Wallet updateWallet(Long walletId, WalletDto walletDto);
 
     WalletDto findWalletById(Long id);
 
-    void deleteWalletByID(Long id);
+    void deleteWalletById(Long id);
 
-    void updateWalletAmount(Long id, WalletDto walletDto);
+    WalletInfoDto getWalletWithPermission(Long walletId, Long userId);
 
-    void shareWallet(Long id, String email, String roleName);
+    boolean isOwner(Long walletId, Long userId);
 
-    void addNewWalletRole(Long id,String roleName);
+    void updateWalletAmount(Long id, BigDecimal newAmount);
+
 
     Set<WalletInfoDto> findAllWalletByUserId(Long id);
 
+    void shareWallet(Long walletId, String email, String walletRoleName);
 
 }
