@@ -112,7 +112,6 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void deleteWalletById(Long walletId) {
-
             walletRepository.deleteById(walletId);
     }
 
@@ -120,7 +119,7 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public Set<WalletInfoDto> findAllWalletByUserId(Long id) {
-        return walletRepository.findAllWalletByUserId(id);
+        return walletRepository.findAllByUserId(id);
     }
     @Override
     public void shareWallet(Long walletId, String email, String walletRoleName) {
