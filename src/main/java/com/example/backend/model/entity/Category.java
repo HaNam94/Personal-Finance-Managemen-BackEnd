@@ -20,8 +20,8 @@ public class Category {
     private String categoryName;
     private String icon;
     private String note;
-// 1 la thu, 0 la chi
-   private Integer categoryType;
+    // 1 la thu(incomes) - 0 la chi(expenses)
+    private Integer categoryType;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDefault = false;

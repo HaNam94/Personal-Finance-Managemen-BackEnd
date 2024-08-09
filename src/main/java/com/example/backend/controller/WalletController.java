@@ -18,7 +18,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -74,6 +76,14 @@ public class WalletController {
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
+    @PutMapping("/{id}/{newAmount}")
+    public ResponseEntity<?> updateWalletAmount(@PathVariable Long id, @PathVariable BigDecimal newAmount ) {
+        walletService.updateWalletAmount(id,newAmount);
+        return ResponseEntity.ok().build();
+    }
+
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteWallet(
             @PathVariable Long id,
@@ -83,8 +93,17 @@ public class WalletController {
         if (!walletService.isOwner(id, userDto.getId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        walletService.deleteWallet(id);
+        walletService.deleteWalletById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/share-wallet/{id}")
+    public ResponseEntity<?> shareWallet(@PathVariable Long walletId
+                                        ,Authentication authentication
+                                        ,String email
+                                        , String walletRoleName){
+        walletService.shareWallet(walletId,email,walletRoleName);
+        return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
 
