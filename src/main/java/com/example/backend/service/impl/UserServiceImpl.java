@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.example.backend.dto.UserDto;
 import com.example.backend.dto.UserUpdateDto;
+import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.dto.request.FormLogin;
 import com.example.backend.dto.request.FormRegister;
 import com.example.backend.dto.response.ResponseSuccess;
@@ -212,23 +213,19 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
-    public ResponseSuccess deleteUserById(Long id) {
-//        List<Wallet> wallets = walletRepository.findAllByUserId(id);
-//        wallets.forEach(wallet -> {
-//            List<Transaction> transactions = transactionRepository.getTransactionsByWalletId(wallet.getId());
-//            transactions.forEach(transaction -> {
-//                transactionRepository.deleteTransactionById(transaction.getId());
-//            });
-//            walletRepository.deleteWalletByID(wallet.getId());
-//
-//        });
-//
-//        List<Budget> budgets = budgetRepository.getBudgetsByUserId(id);
-//        budgets.forEach(budget -> {
-//            budgetRepository.deleteBudgetById(budget.getId());
-//        });
-//
-//        userRepository.deleteUserById(id);
+    public ResponseSuccess deleteUserById(Long userId) {
+        Set<WalletInfoDto> wallets = walletRepository.findAllByUserId(userId);
+        transactionRepository.deleteTransactionByUserId(userId);
+        wallets.forEach(wallet -> {
+            walletRepository.deleteWalletById(wallet.getId());
+        });
+
+        List<Budget> budgets = budgetRepository.getBudgetsByUserId(userId);
+        budgets.forEach(budget -> {
+            budgetRepository.deleteBudgetById(budget.getId());
+        });
+
+        userRepository.deleteUserById(userId);
         ResponseSuccess responseSuccess = new ResponseSuccess();
         responseSuccess.setMessage("Delete success");
         responseSuccess.setStatus(HttpStatus.OK);
@@ -271,10 +268,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     public Boolean checkIsExistPhone(String phone) {
-//        User user = userRepository.findUserByPhone(phone).orElse(null);
-//        if (user == null) {
-//            return false;
-//        }
+        User user = userRepository.findUserByPhone(phone).orElse(null);
+        if (user == null) {
+            return false;
+        }
         return true;
     }
 

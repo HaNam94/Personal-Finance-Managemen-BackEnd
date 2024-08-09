@@ -2,21 +2,33 @@ package com.example.backend.service;
 
 import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.WalletInfoDto;
+import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.model.entity.Wallet;
+import com.example.backend.security.principals.CustomUserDetails;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
+import java.util.List;
+
 public interface IWalletService {
+    Wallet saveWallet(Long ownerId, WalletDto walletDto);
+
+    Wallet updateWallet(Long walletId, WalletDto walletDto);
+
+    WalletDto findWalletById(Long id);
+
+    void deleteWalletById(Long id);
+
+    WalletInfoDto getWalletWithPermission(Long walletId, Long userId);
+
+    boolean isOwner(Long walletId, Long userId);
+
+    void updateWalletAmount(Long id, BigDecimal newAmount);
+
 
     Set<WalletInfoDto> findAllWalletByUserId(Long id);
 
-    Wallet saveWallet(Long id, WalletDto walletDto);
+    void shareWallet(Long walletId, String email, String walletRoleName);
 
-    WalletInfoDto getWalletWithPermission(Long id, Long id1);
-
-    boolean isOwner(Long id, Long id1);
-
-    void updateWallet(Long id, WalletDto walletDto);
-
-    void deleteWallet(Long id);
 }
