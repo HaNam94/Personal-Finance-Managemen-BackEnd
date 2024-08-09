@@ -74,9 +74,9 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void updateWalletAmount(Long id, BigDecimal newAmount) {
-        Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new RuntimeException("Khong tim thay vi"));
-        wallet.setAmount(newAmount);
-        walletRepository.save(wallet);
+    Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new RuntimeException("Khong tim thay vi"));
+    wallet.setAmount(newAmount);
+    walletRepository.save(wallet);
     }
 
     @Override
