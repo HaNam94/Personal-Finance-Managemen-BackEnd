@@ -87,7 +87,7 @@ public class WalletServiceImpl implements IWalletService {
         wallet.setIcon(walletDto.getIcon());
         wallet.setWalletDescription(walletDto.getWalletDescription());
         wallet.setCurrency(walletDto.getCurrency());
-        wallet.setAmount(wallet.getAmount().add(walletDto.getAmount()));
+        wallet.setAmount(walletDto.getAmount());
         walletRepository.save(wallet);
 
         return wallet;
