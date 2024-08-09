@@ -87,7 +87,7 @@ public class WalletServiceImpl implements IWalletService {
             wallet.setIcon(walletDto.getIcon());
             wallet.setWalletDescription(walletDto.getWalletDescription());
             wallet.setCurrency(walletDto.getCurrency());
-            wallet.setAmount(wallet.getAmount().add(walletDto.getAmount()));
+            wallet.setAmount(walletDto.getAmount());
             walletRepository.save(wallet);
 
         return wallet;
@@ -97,7 +97,6 @@ public class WalletServiceImpl implements IWalletService {
     @Override
     public WalletDto findWalletById(Long walletId) {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Wallet not found"));
-
         WalletDto walletDto = WalletDto.builder()
                 .walletName(wallet.getWalletName())
                 .icon(wallet.getIcon())
