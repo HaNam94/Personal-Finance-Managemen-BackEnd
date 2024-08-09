@@ -13,21 +13,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class WalletServiceImpl implements IWalletService {
     @Autowired
-    private IWalletRepo walletRepo;
+    private IWalletRepo walletRepository;
     @Autowired
     private IUserRepo userRepository;
 
-    @Override
-    public Set<WalletInfoDto> findAllWalletByUserId(Long id) {
-        return walletRepo.findAllByUserId(id);
-    }
+
 
     @Override
     public Wallet saveWallet(Long ownerId, WalletDto walletDto) {
@@ -59,32 +59,95 @@ public class WalletServiceImpl implements IWalletService {
         wallet.getWalletRoles().add(walletUserRole);
         owner.getWalletRoles().add(walletUserRole);
 
-        return walletRepo.save(wallet);
+        return walletRepository.save(wallet);
     }
 
     @Override
     public WalletInfoDto getWalletWithPermission(Long walletId, Long userId) {
-        return walletRepo.findWalletByIdAndUserId(walletId, userId);
+        return walletRepository.findWalletByIdAndUserId(walletId, userId);
     }
 
     @Override
     public boolean isOwner(Long walletId, Long userId) {
-        return walletRepo.isOwner(walletId, userId);
+        return walletRepository.isOwner(walletId, userId);
     }
 
     @Override
-    public void updateWallet(Long id, WalletDto walletDto) {
-        Wallet wallet = walletRepo.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
-        wallet.setWalletName(walletDto.getWalletName());
-        wallet.setIcon(walletDto.getIcon());
-        wallet.setWalletDescription(walletDto.getWalletDescription());
-        wallet.setCurrency(walletDto.getCurrency());
-        wallet.setAmount(walletDto.getAmount());
-        walletRepo.save(wallet);
+    public void updateWalletAmount(Long id, BigDecimal newAmount) {
+    Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new RuntimeException("Khong tim thay vi"));
+    wallet.setAmount(newAmount);
+    walletRepository.save(wallet);
     }
 
     @Override
-    public void deleteWallet(Long id) {
-        walletRepo.deleteById(id);
+    public Wallet updateWallet(Long walletId, WalletDto walletDto) {
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
+        Boolean isOwner = false;
+        for (WalletUserRole walletUserRole : wallet.getWalletRoles()) {
+            if (walletUserRole.getRole().equals("OWNER")){
+                isOwner = true;
+                break;
+            }
+        }
+        if (isOwner) {
+            wallet.setWalletName(walletDto.getWalletName());
+            wallet.setIcon(walletDto.getIcon());
+            wallet.setWalletDescription(walletDto.getWalletDescription());
+            wallet.setCurrency(walletDto.getCurrency());
+            wallet.setAmount(wallet.getAmount().add(walletDto.getAmount()));
+            walletRepository.save(wallet);
+        }
+
+        return wallet;
+    }
+
+
+    @Override
+    public WalletDto findWalletById(Long walletId) {
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+        WalletDto walletDto = WalletDto.builder()
+                .walletName(wallet.getWalletName())
+                .icon(wallet.getIcon())
+                .walletDescription(wallet.getWalletDescription())
+                .currency(wallet.getCurrency())
+                .amount(wallet.getAmount())
+                .id(wallet.getId())
+                .build();
+        return walletDto;
+    }
+
+    @Override
+    public void deleteWalletById(Long walletId) {
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
+        Boolean isOwner = false;
+        for (WalletUserRole walletUserRole : wallet.getWalletRoles()) {
+            if (walletUserRole.getRole().equals("OWNER")){
+                isOwner = true;
+                break;
+            }
+        }
+        if (isOwner) {
+            walletRepository.deleteWalletById(walletId);
+        }
+    }
+
+
+
+    @Override
+    public Set<WalletInfoDto> findAllWalletByUserId(Long id) {
+        return walletRepository.findAllWalletByUserId(id);
+    }
+    @Override
+    public void shareWallet(Long walletId, String email, String walletRoleName) {
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng này"));
+
+        WalletUserRole walletUserRole = new WalletUserRole();
+        walletUserRole.setUser(user);
+        walletUserRole.setWallet(wallet);
+        walletUserRole.setRole(WalletRole.valueOf(walletRoleName));
+        wallet.getWalletRoles().add(walletUserRole);
+        walletRepository.save(wallet);
     }
 }
