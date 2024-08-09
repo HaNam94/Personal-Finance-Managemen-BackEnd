@@ -83,12 +83,12 @@ public class WalletServiceImpl implements IWalletService {
     public Wallet updateWallet(Long walletId, WalletDto walletDto) {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
 
-            wallet.setWalletName(walletDto.getWalletName());
-            wallet.setIcon(walletDto.getIcon());
-            wallet.setWalletDescription(walletDto.getWalletDescription());
-            wallet.setCurrency(walletDto.getCurrency());
-            wallet.setAmount(wallet.getAmount().add(walletDto.getAmount()));
-            walletRepository.save(wallet);
+        wallet.setWalletName(walletDto.getWalletName());
+        wallet.setIcon(walletDto.getIcon());
+        wallet.setWalletDescription(walletDto.getWalletDescription());
+        wallet.setCurrency(walletDto.getCurrency());
+        wallet.setAmount(wallet.getAmount().add(walletDto.getAmount()));
+        walletRepository.save(wallet);
 
         return wallet;
     }
@@ -111,14 +111,14 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void deleteWalletById(Long walletId) {
-            walletRepository.deleteWalletById(walletId);
+            walletRepository.deleteById(walletId);
     }
 
 
 
     @Override
     public Set<WalletInfoDto> findAllWalletByUserId(Long id) {
-        return walletRepository.findAllWalletByUserId(id);
+        return walletRepository.findAllByUserId(id);
     }
     @Override
     public void shareWallet(Long walletId, String email, String walletRoleName) {
