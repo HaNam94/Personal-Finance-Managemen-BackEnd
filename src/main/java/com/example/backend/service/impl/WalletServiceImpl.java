@@ -82,21 +82,14 @@ public class WalletServiceImpl implements IWalletService {
     @Override
     public Wallet updateWallet(Long walletId, WalletDto walletDto) {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
-        Boolean isOwner = false;
-        for (WalletUserRole walletUserRole : wallet.getWalletRoles()) {
-            if (walletUserRole.getRole().equals("OWNER")){
-                isOwner = true;
-                break;
-            }
-        }
-        if (isOwner) {
+
             wallet.setWalletName(walletDto.getWalletName());
             wallet.setIcon(walletDto.getIcon());
             wallet.setWalletDescription(walletDto.getWalletDescription());
             wallet.setCurrency(walletDto.getCurrency());
-            wallet.setAmount(wallet.getAmount().add(walletDto.getAmount()));
+            wallet.setAmount(walletDto.getAmount());
             walletRepository.save(wallet);
-        }
+
 
         return wallet;
     }
@@ -119,17 +112,8 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void deleteWalletById(Long walletId) {
-        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
-        Boolean isOwner = false;
-        for (WalletUserRole walletUserRole : wallet.getWalletRoles()) {
-            if (walletUserRole.getRole().equals("OWNER")){
-                isOwner = true;
-                break;
-            }
-        }
-        if (isOwner) {
-            walletRepository.deleteWalletById(walletId);
-        }
+
+            walletRepository.deleteById(walletId);
     }
 
 

@@ -28,8 +28,7 @@ public interface IWalletRepo extends JpaRepository<Wallet, Long> {
     @Query(value = "select w from User u join WalletUserRole wr on :userId = wr.user.id join Wallet w on wr.wallet.id = w.id")
     Set<WalletInfoDto> findAllWalletByUserId(Long userId);
 
-    @Query(value = "delete from wallet where id = :walletId", nativeQuery = true)
-    void deleteWalletById(Long walletId);
+
 
 
 }
