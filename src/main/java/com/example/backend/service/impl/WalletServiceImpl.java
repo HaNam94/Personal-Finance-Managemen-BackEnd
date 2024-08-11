@@ -90,7 +90,6 @@ public class WalletServiceImpl implements IWalletService {
             wallet.setAmount(walletDto.getAmount());
             walletRepository.save(wallet);
 
-
         return wallet;
     }
 
