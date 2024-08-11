@@ -15,6 +15,6 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
 
     @Query(value = "delete from transaction where user_id = :userId", nativeQuery = true)
     void deleteTransactionByUserId(Long userId);
-    @Query(value = "select tr from transaction tr where user_id = :userId" ,nativeQuery = true)
+    @Query(value = "select * from transaction tr where user_id = :userId" ,nativeQuery = true)
     List<Transaction> findAllTransactionByUserId(@Param("userId") Long userId);
 }
