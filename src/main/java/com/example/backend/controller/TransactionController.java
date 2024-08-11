@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.TransactionDto;
+import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.dto.UserDto;
 import com.example.backend.model.entity.Transaction;
 import com.example.backend.security.principals.CustomUserDetails;
@@ -20,16 +21,21 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/v1/user/transaction")
+@RequestMapping("/api/v1/transaction")
 @RequiredArgsConstructor
 public class TransactionController {
     private final ITransactionService transactionService;
     private final IUserService userService;
 
+
+    private UserDto getUserDto(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return userService.findUserByEmail(userDetails.getUsername());
+    }
+
     @GetMapping("")
     public  ResponseEntity<?> getAllTransactions(Authentication authentication) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        UserDto user =  userService.findUserByEmail(customUserDetails.getEmail());
+        UserDto user =  getUserDto(authentication);
        List<Transaction> transactions = transactionService.findAllTransactionByUserId(user.getId());
         return ResponseEntity.ok().body(transactions);
     }
@@ -43,8 +49,7 @@ public class TransactionController {
            }
             return ResponseEntity.badRequest().body(errors);
         }
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        UserDto user =  userService.findUserByEmail(customUserDetails.getEmail());
+        UserDto user =  getUserDto(authentication);
         transactionService.save(user.getId(),transactionDto);
         return ResponseEntity.ok().body(transactionDto);
     }

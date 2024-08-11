@@ -106,7 +106,6 @@ public class WalletController {
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
-
     private UserDto getUserDto(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userService.findUserByEmail(userDetails.getUsername());
