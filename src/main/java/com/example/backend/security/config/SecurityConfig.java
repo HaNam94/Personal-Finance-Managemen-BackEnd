@@ -68,6 +68,8 @@ public class SecurityConfig {
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/user/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers("/api/v1/wallets/share-wallet/**").permitAll()
+                        .requestMatchers("/api/v1/wallets/**").permitAll()
                         .requestMatchers("/api/v1/moderator").hasAnyRole("ADMIN","MODERATOR")
                         .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

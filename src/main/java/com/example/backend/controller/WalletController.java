@@ -84,7 +84,7 @@ public class WalletController {
 
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{walletId}")
     public ResponseEntity<?> deleteWallet(
             @PathVariable Long walletId,
             Authentication authentication
@@ -98,12 +98,20 @@ public class WalletController {
     }
 
     @PostMapping("/share-wallet/{id}")
-    public ResponseEntity<?> shareWallet(@PathVariable Long walletId
-                                        ,Authentication authentication
-                                        ,String email
-                                        , String walletRoleName){
-        walletService.shareWallet(walletId,email,walletRoleName);
-        return new ResponseEntity<>("{}", HttpStatus.OK);
+    public ResponseEntity<?> shareWallet(@PathVariable("id") Long walletId,
+                                         Authentication authentication,
+                                         @RequestParam("email") String email,
+                                         @RequestParam("role") String walletRoleName) {
+        try {
+            System.out.println("walletId: " + walletId);
+            System.out.println("email: " + email);
+            System.out.println("role: " + walletRoleName);
+            walletService.shareWallet(walletId, email, walletRoleName);
+            return new ResponseEntity<>("{}", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Lỗi xảy ra: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     private UserDto getUserDto(Authentication authentication) {
