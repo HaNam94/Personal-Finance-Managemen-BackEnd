@@ -84,7 +84,7 @@ public class WalletController {
 
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{walletId}")
     public ResponseEntity<?> deleteWallet(
             @PathVariable Long walletId,
             Authentication authentication
