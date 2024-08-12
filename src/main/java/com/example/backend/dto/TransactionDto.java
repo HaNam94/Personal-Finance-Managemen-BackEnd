@@ -15,8 +15,7 @@ import java.time.LocalDate;
 @Builder
 public class TransactionDto {
     private Long id;
-    @NotNull(message = ValidationMessage.NOT_NULL)
-    private String transactionType;
+
     private String note;
     @Min(value = 0)
     private BigDecimal amount;
