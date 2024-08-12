@@ -33,7 +33,7 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Override
     public Transaction findTransactionById(Long id) {
-        return transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
+        return null;
     }
 
     @Override
@@ -42,6 +42,7 @@ public class TransactionServiceImpl implements ITransactionService {
         Wallet wallet = walletRepository.findById(transactionDto.getWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Transaction transaction = Transaction.builder()
+                .transactionType(category.getCategoryType())
                 .amount(transactionDto.getAmount())
                 .note(transactionDto.getNote())
                 .datetime(transactionDto.getDatetime())
@@ -49,9 +50,9 @@ public class TransactionServiceImpl implements ITransactionService {
                 .wallet(wallet)
                 .user(user)
                 .build();
-        if (transaction.getCategory().getCategoryType() == 1) {
+        if (transaction.getTransactionType() == 1) {
             wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
-        }else if (transaction.getCategory().getCategoryType() == 0) {
+        }else if (transaction.getTransactionType() == 0) {
             wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
         }
         walletRepository.save(wallet);
@@ -69,15 +70,15 @@ public class TransactionServiceImpl implements ITransactionService {
         Category category = categoryRepository.findById(transactionDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
         Wallet wallet = walletRepository.findById(transactionDto.getWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
 
-
+        transaction.setTransactionType(category.getCategoryType());
         transaction.setNote(transactionDto.getNote());
         transaction.setAmount(transactionDto.getAmount());
         transaction.setDatetime(transactionDto.getDatetime());
         transaction.setCategory(category);
         transaction.setWallet(wallet);
-        if (transaction.getCategory().getCategoryType() == 1) {
+        if (transaction.getTransactionType() == 1) {
             wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
-        }else if (transaction.getCategory().getCategoryType() == 0) {
+        }else if (transaction.getTransactionType() == 0) {
             wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
         }
         walletRepository.save(wallet);

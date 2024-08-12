@@ -1,12 +1,16 @@
 package com.example.backend.repository;
 
+import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.model.entity.Wallet;
+import com.example.backend.model.entity.WalletUserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -21,10 +25,11 @@ public interface IWalletRepo extends JpaRepository<Wallet, Long> {
     boolean isOwner(@Param("walletId") Long walletId, @Param("userId") Long userId);
 
 
-//    @Query(value = "select w from User u join WalletUserRole wr on :userId = wr.user.id join Wallet w on wr.wallet.id = w.id")
-//    Set<WalletInfoDto> findAllWalletByUserId(Long userId);
+    @Query(value = "select w from User u join WalletUserRole wr on :userId = wr.user.id join Wallet w on wr.wallet.id = w.id")
+    Set<WalletInfoDto> findAllWalletByUserId(Long userId);
 
-
+    @Query(value = "delete from wallet where id = :walletId", nativeQuery = true)
+    void deleteWalletById(Long walletId);
 
 
 }
