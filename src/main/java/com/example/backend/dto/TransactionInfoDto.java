@@ -1,6 +1,7 @@
 package com.example.backend.dto;
 
 import com.example.backend.model.entity.Category;
+import com.example.backend.model.entity.Wallet;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,6 +11,9 @@ public interface TransactionInfoDto {
     String getNote();
     BigDecimal getAmount();
     LocalDate getDatetime();
-    Category getCategory();
-    WalletDto getWallet();
+    String getIcon();
+    Integer getCategoryType();
+    String getCategoryName();
+    String getWalletName();
+
 }
