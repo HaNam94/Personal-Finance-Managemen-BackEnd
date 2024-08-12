@@ -9,6 +9,7 @@ import com.example.backend.service.ITransactionService;
 import com.example.backend.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -36,8 +37,8 @@ public class TransactionController {
     @GetMapping("")
     public  ResponseEntity<?> getAllTransactions(Authentication authentication) {
         UserDto user =  getUserDto(authentication);
-       List<Transaction> transactions = transactionService.findAllTransactionByUserId(user.getId());
-        return ResponseEntity.ok().body(transactions);
+       List<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId());
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
     @PostMapping("/add")
