@@ -1,6 +1,7 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.TransactionDto;
+import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.model.entity.Category;
 import com.example.backend.model.entity.Transaction;
 import com.example.backend.model.entity.User;
@@ -26,7 +27,7 @@ public class TransactionServiceImpl implements ITransactionService {
 
 
     @Override
-    public List<Transaction> findAllTransactionByUserId(Long userId) {
+    public List<TransactionInfoDto> findAllTransactionByUserId(Long userId) {
         return transactionRepository.findAllTransactionByUserId(userId);
     }
 

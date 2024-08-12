@@ -1,12 +1,13 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.TransactionDto;
+import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.model.entity.Transaction;
 
 import java.util.List;
 
 public interface ITransactionService {
-    List<Transaction> findAllTransactionByUserId(Long id);
+    List<TransactionInfoDto> findAllTransactionByUserId(Long id);
 
     Transaction findTransactionById(Long id);
 

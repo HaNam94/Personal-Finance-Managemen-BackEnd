@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.TransactionDto;
+import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.dto.UserDto;
 import com.example.backend.model.entity.Transaction;
 import com.example.backend.security.principals.CustomUserDetails;
@@ -8,6 +9,7 @@ import com.example.backend.service.ITransactionService;
 import com.example.backend.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -28,6 +30,9 @@ public class TransactionController {
 
     @GetMapping("")
     public  ResponseEntity<?> getAllTransactions(Authentication authentication) {
+        UserDto user =  getUserDto(authentication);
+       List<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId());
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         UserDto user =  userService.findUserByEmail(customUserDetails.getEmail());
        List<Transaction> transactions = transactionService.findAllTransactionByUserId(user.getId());
