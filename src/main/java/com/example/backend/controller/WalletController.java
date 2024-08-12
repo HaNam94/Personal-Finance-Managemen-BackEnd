@@ -86,14 +86,14 @@ public class WalletController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteWallet(
-            @PathVariable Long id,
+            @PathVariable Long walletId,
             Authentication authentication
     ) {
         UserDto userDto = getUserDto(authentication);
-        if (!walletService.isOwner(id, userDto.getId())) {
+        if (!walletService.isOwner(walletId, userDto.getId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        walletService.deleteWalletById(id);
+        walletService.deleteWalletById(walletId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -105,7 +105,6 @@ public class WalletController {
         walletService.shareWallet(walletId,email,walletRoleName);
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
-
 
     private UserDto getUserDto(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();

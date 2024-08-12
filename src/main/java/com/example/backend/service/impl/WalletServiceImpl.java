@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -83,12 +81,12 @@ public class WalletServiceImpl implements IWalletService {
     public Wallet updateWallet(Long walletId, WalletDto walletDto) {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
 
-        wallet.setWalletName(walletDto.getWalletName());
-        wallet.setIcon(walletDto.getIcon());
-        wallet.setWalletDescription(walletDto.getWalletDescription());
-        wallet.setCurrency(walletDto.getCurrency());
-        wallet.setAmount(walletDto.getAmount());
-        walletRepository.save(wallet);
+            wallet.setWalletName(walletDto.getWalletName());
+            wallet.setIcon(walletDto.getIcon());
+            wallet.setWalletDescription(walletDto.getWalletDescription());
+            wallet.setCurrency(walletDto.getCurrency());
+            wallet.setAmount(walletDto.getAmount());
+            walletRepository.save(wallet);
 
         return wallet;
     }
