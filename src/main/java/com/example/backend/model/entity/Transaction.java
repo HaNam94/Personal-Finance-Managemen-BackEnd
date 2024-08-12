@@ -17,8 +17,7 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // 1 la thu - 0 la chi
-    private Integer transactionType;
+
     private String note;
     private BigDecimal amount;
     private LocalDate datetime;

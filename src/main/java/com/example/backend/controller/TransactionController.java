@@ -22,7 +22,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/v1/user/transaction")
+@RequestMapping("/api/v1/transaction")
 @RequiredArgsConstructor
 public class TransactionController {
     private final ITransactionService transactionService;
