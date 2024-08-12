@@ -122,14 +122,30 @@ public class WalletServiceImpl implements IWalletService {
     }
     @Override
     public void shareWallet(Long walletId, String email, String walletRoleName) {
-        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
-        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng này"));
+        try {
+            Wallet wallet = walletRepository.findById(walletId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy ví"));
 
-        WalletUserRole walletUserRole = new WalletUserRole();
-        walletUserRole.setUser(user);
-        walletUserRole.setWallet(wallet);
-        walletUserRole.setRole(WalletRole.valueOf(walletRoleName));
-        wallet.getWalletRoles().add(walletUserRole);
-        walletRepository.save(wallet);
+            User user = userRepository.findUserByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+
+            boolean alreadyShared = wallet.getWalletRoles().stream()
+                    .anyMatch(role -> role.getUser().getId().equals(user.getId()));
+
+            if (alreadyShared) {
+                throw new RuntimeException("Ví này đã được chia sẻ với người dùng này.");
+            }
+
+            WalletUserRole walletUserRole = new WalletUserRole();
+            walletUserRole.setUser(user);
+            walletUserRole.setWallet(wallet);
+            walletUserRole.setRole(WalletRole.valueOf(walletRoleName));
+
+            wallet.getWalletRoles().add(walletUserRole);
+            walletRepository.save(wallet);
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi trong quá trình chia sẻ ví: " + e.getMessage());
+        }
     }
+
 }
