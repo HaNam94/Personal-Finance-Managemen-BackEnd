@@ -21,9 +21,9 @@ public class Transaction {
     private String note;
     private BigDecimal amount;
     private LocalDate datetime;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Wallet wallet;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
