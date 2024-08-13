@@ -32,8 +32,18 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     @Override
-    public Transaction findTransactionById(Long id) {
-        return null;
+    public TransactionDto findTransactionById(Long id) {
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
+        TransactionDto dto =TransactionDto.builder()
+                .id(transaction.getId())
+                .categoryId(transaction.getCategory().getId())
+                .walletId(transaction.getWallet().getId())
+                .amount(transaction.getAmount())
+                .datetime(transaction.getDatetime())
+                .note(transaction.getNote())
+                .categoryType(transaction.getCategory().getCategoryType())
+                .build();
+        return dto;
     }
 
     @Override
@@ -42,7 +52,6 @@ public class TransactionServiceImpl implements ITransactionService {
         Wallet wallet = walletRepository.findById(transactionDto.getWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Transaction transaction = Transaction.builder()
-
                 .amount(transactionDto.getAmount())
                 .note(transactionDto.getNote())
                 .datetime(transactionDto.getDatetime())

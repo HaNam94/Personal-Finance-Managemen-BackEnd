@@ -16,4 +16,5 @@ public interface TransactionInfoDto {
     String getCategoryName();
     String getWalletName();
 
+
 }
