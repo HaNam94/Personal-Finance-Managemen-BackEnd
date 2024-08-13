@@ -15,6 +15,7 @@ import com.example.backend.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -80,18 +81,75 @@ public class TransactionServiceImpl implements ITransactionService {
         Category category = categoryRepository.findById(transactionDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
         Wallet wallet = walletRepository.findById(transactionDto.getWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
 
+        Category oldCategory = categoryRepository.findById(transaction.getCategory().getId()).orElseThrow(() -> new RuntimeException("Category not found"));
+        Wallet oldWallet = walletRepository.findById(transaction.getWallet().getId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
+        if (wallet.getId() == oldWallet.getId()) {
+            // old la thu - new la chi
+            if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
+                BigDecimal newAmount = oldWallet.getAmount().subtract(transaction.getAmount()).subtract(transactionDto.getAmount());
+                wallet.setAmount(newAmount);
 
+            }
+            // old la thu - new la thu
+            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
+                BigDecimal newAmount = oldWallet.getAmount().subtract(transaction.getAmount()).add(transactionDto.getAmount());
+                wallet.setAmount(newAmount);
+            }
+            // old la chi - new la chi
+            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 0) {
+                BigDecimal newAmount = oldWallet.getAmount().add(transaction.getAmount()).subtract(transactionDto.getAmount());
+                wallet.setAmount(newAmount);
+            }
+            // old la chi - new la thu
+            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
+                BigDecimal newAmount = oldWallet.getAmount().add(transaction.getAmount()).add(transactionDto.getAmount());
+                wallet.setAmount(newAmount);
+            }
+            walletRepository.save(wallet);
+
+        }else{
+            // old la thu - new la chi
+            if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
+                BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
+                BigDecimal newAmount = wallet.getAmount().subtract(transactionDto.getAmount());
+                oldWallet.setAmount(oldAmount);
+                wallet.setAmount(newAmount);
+
+            }
+            // old la thu - new la thu
+            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
+                BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
+                BigDecimal newAmount = wallet.getAmount().add(transactionDto.getAmount());
+                oldWallet.setAmount(oldAmount);
+                wallet.setAmount(newAmount);
+
+            }
+            // old la chi - new la chi
+            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 0) {
+                BigDecimal oldAmount = oldWallet.getAmount().add(transaction.getAmount());
+                BigDecimal newAmount = wallet.getAmount().subtract(transactionDto.getAmount());
+                oldWallet.setAmount(oldAmount);
+                wallet.setAmount(newAmount);
+
+            }
+            // old la chi - new la thu
+            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
+                BigDecimal oldAmount = oldWallet.getAmount().add(transaction.getAmount());
+                BigDecimal newAmount = wallet.getAmount().add(transactionDto.getAmount());
+                oldWallet.setAmount(oldAmount);
+                wallet.setAmount(newAmount);
+
+            }
+            walletRepository.save(oldWallet);
+            walletRepository.save(wallet);
+
+        }
         transaction.setNote(transactionDto.getNote());
         transaction.setAmount(transactionDto.getAmount());
         transaction.setDatetime(transactionDto.getDatetime());
         transaction.setCategory(category);
         transaction.setWallet(wallet);
-        if (transaction.getCategory().getCategoryType() == 1) {
-            wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
-        }else if (transaction.getCategory().getCategoryType() == 0) {
-            wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
-        }
-        walletRepository.save(wallet);
+
         transactionRepository.save(transaction);
 
     }
