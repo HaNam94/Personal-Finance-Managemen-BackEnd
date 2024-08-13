@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.example.backend.dto.TransactionDto;
 import com.example.backend.dto.TransactionInfoDto;
+import com.example.backend.dto.TransactionSimpleDto;
 import com.example.backend.model.entity.Category;
 import com.example.backend.model.entity.Transaction;
 import com.example.backend.model.entity.User;
@@ -151,5 +152,10 @@ public class TransactionServiceImpl implements ITransactionService {
         walletRepository.save(wallet);
         transactionRepository.save(transaction);
 
+    }
+
+    @Override
+    public List<TransactionSimpleDto> searchTransactionWithUserId(Long userId, Long categoryId) {
+        return transactionRepository.findAllByUserIdAndCategoryId(userId, categoryId);
     }
 }
