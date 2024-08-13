@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.TransactionDto;
 import com.example.backend.dto.TransactionInfoDto;
+import com.example.backend.dto.TransactionSimpleDto;
 import com.example.backend.dto.UserDto;
 import com.example.backend.model.entity.Transaction;
 import com.example.backend.security.principals.CustomUserDetails;
@@ -71,6 +72,16 @@ public class TransactionController {
         public ResponseEntity<?> deleteTransaction(@PathVariable Long id) {
         transactionService.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchTransactions(
+            @RequestParam Long categoryId,
+            Authentication authentication
+    ) {
+        UserDto user =  getUserDto(authentication);
+        List<TransactionSimpleDto> transactions = transactionService.searchTransactionWithUserId(user.getId(), categoryId);
+        return ResponseEntity.ok().body(transactions);
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> getTransactionById(@PathVariable Long id) {
