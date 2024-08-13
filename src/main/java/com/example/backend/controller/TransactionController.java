@@ -27,8 +27,6 @@ import java.util.Map;
 public class TransactionController {
     private final ITransactionService transactionService;
     private final IUserService userService;
-
-
     private UserDto getUserDto(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userService.findUserByEmail(userDetails.getUsername());
@@ -38,7 +36,7 @@ public class TransactionController {
     public  ResponseEntity<?> getAllTransactions(Authentication authentication) {
         UserDto user =  getUserDto(authentication);
        List<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId());
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
+        return ResponseEntity.ok().body(transactions);
     }
 
     @PostMapping("/add")
@@ -50,7 +48,8 @@ public class TransactionController {
            }
             return ResponseEntity.badRequest().body(errors);
         }
-        UserDto user =  getUserDto(authentication);
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserDto user =  userService.findUserByEmail(customUserDetails.getEmail());
         transactionService.save(user.getId(),transactionDto);
         return ResponseEntity.ok().body(transactionDto);
     }

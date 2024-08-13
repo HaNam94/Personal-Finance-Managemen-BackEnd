@@ -86,14 +86,14 @@ public class WalletController {
 
     @DeleteMapping("/{walletId}")
     public ResponseEntity<?> deleteWallet(
-            @PathVariable Long walletId,
+            @PathVariable Long id,
             Authentication authentication
     ) {
         UserDto userDto = getUserDto(authentication);
-        if (!walletService.isOwner(walletId, userDto.getId())) {
+        if (!walletService.isOwner(id, userDto.getId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        walletService.deleteWalletById(walletId);
+        walletService.deleteWalletById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -113,6 +113,7 @@ public class WalletController {
             return new ResponseEntity<>("Lỗi xảy ra: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 
     private UserDto getUserDto(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();

@@ -217,7 +217,7 @@ public class UserServiceImpl implements IUserService {
         Set<WalletInfoDto> wallets = walletRepository.findAllByUserId(userId);
         transactionRepository.deleteTransactionByUserId(userId);
         wallets.forEach(wallet -> {
-            walletRepository.deleteById(wallet.getId());
+            walletRepository.deleteWalletById(wallet.getId());
         });
 
         List<Budget> budgets = budgetRepository.getBudgetsByUserId(userId);
