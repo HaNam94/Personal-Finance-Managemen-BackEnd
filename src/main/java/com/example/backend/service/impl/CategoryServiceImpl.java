@@ -1,8 +1,11 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.CategoryDto;
+import com.example.backend.dto.CategoryFormDto;
 import com.example.backend.model.entity.Category;
+import com.example.backend.model.entity.User;
 import com.example.backend.repository.ICategoryRepo;
+import com.example.backend.repository.IUserRepo;
 import com.example.backend.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,8 @@ import org.springframework.stereotype.Service;
 public class CategoryServiceImpl implements ICategoryService {
     @Autowired
     private ICategoryRepo categoryRepo;
+    @Autowired
+    private IUserRepo userRepo;
     @Override
     public Iterable<CategoryDto> findAllMasterCategoryByUserId(Long id) {
         return categoryRepo.findAllByParentCategoryIsNullAndUserId(id);
@@ -24,5 +29,23 @@ public class CategoryServiceImpl implements ICategoryService {
         }
 
         categoryRepo.deleteById(id);
+    }
+
+    @Override
+    public void saveCategory(CategoryFormDto categoryFormDto, Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        Category category = new Category();
+        category.setCategoryName(categoryFormDto.getCategoryName());
+        category.setUser(user);
+        category.setCategoryType(categoryFormDto.getCategoryType());
+        category.setNote(categoryFormDto.getNote());
+        category.setIcon(categoryFormDto.getIcon());
+
+        if(categoryFormDto.getParentId() != null) {
+            Category parentCategory = categoryRepo.findById(categoryFormDto.getParentId()).orElseThrow(() -> new RuntimeException("Cannot find parent category"));
+            category.setParentCategory(parentCategory);
+        }
+        categoryRepo.save(category);
     }
 }
