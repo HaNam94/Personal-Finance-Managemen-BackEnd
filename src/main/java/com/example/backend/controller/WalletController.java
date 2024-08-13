@@ -119,4 +119,15 @@ public class WalletController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userService.findUserByEmail(userDetails.getUsername());
     }
+    @PostMapping("/transfer/{fromWalletId}/{toWalletId}/{amount}")
+    public ResponseEntity<String> transferMoney(
+            @PathVariable(value = "fromWalletId", required = false) Long fromWalletId,
+            @PathVariable(value = "toWalletId", required = false) Long toWalletId,
+            @PathVariable(value = "amount", required = false) BigDecimal amount) {
+
+        walletService.transferMoney(fromWalletId, toWalletId, amount);
+        return ResponseEntity.ok("Transfer successful");
+    }
+
+
 }

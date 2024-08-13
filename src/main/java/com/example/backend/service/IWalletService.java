@@ -31,4 +31,5 @@ public interface IWalletService {
 
     void shareWallet(Long walletId, String email, String walletRoleName);
 
+    void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount);
 }

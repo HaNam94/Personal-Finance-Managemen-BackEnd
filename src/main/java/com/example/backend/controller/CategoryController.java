@@ -41,6 +41,35 @@ public class CategoryController {
         return new ResponseEntity<>("{}", HttpStatus.CREATED);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCategoryById(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        System.out.println(id);
+        System.out.println("=======");
+        UserDto userDto = getUserDto(authentication);
+        CategoryDto categoryDto = categoryService.findCategoryById(id);
+        if (categoryDto == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (!categoryDto.getUserId().equals(userDto.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCategory(
+            @PathVariable Long id,
+            @Validated @RequestBody CategoryFormDto categoryFormDto,
+            Authentication authentication) {
+        categoryService.updateCategory(id, categoryFormDto);
+        return new ResponseEntity<>("{}", HttpStatus.OK);
+
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCategory(
             @PathVariable Long id,
