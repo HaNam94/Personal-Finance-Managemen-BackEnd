@@ -8,8 +8,10 @@ public interface WalletUserRoleDto {
     WalletRole getRole();
     @Value("#{target.user.id}")
     Long getUserId();
-//    @Value("#{target.user.avatar}")
-//    String getUserImage();
-//    @Value("#{target.user.email}")
-//    String getUserEmail();
+    @Value("#{target.user.avatar}")
+    String getUserImage();
+    @Value("#{target.user.email}")
+    String getUserEmail();
+    @Value("#{target.user.username}")
+    String getUserName();
 }

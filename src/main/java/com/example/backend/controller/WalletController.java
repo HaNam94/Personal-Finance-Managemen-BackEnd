@@ -4,6 +4,7 @@ import com.example.backend.dto.UserDto;
 import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.dto.response.ResponseSuccess;
+import com.example.backend.model.WalletRole;
 import com.example.backend.model.entity.Wallet;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IUserService;
@@ -119,6 +120,36 @@ public class WalletController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userService.findUserByEmail(userDetails.getUsername());
     }
+
+    @DeleteMapping("/share-wallet/{walletId}")
+    public ResponseEntity<?> removeWalletShare(
+            @PathVariable Long walletId,
+            @RequestParam String email) {
+
+        try {
+            walletService.removeWalletShare(walletId, email);
+            return ResponseEntity.ok().body("Tài khoản đã được xóa khỏi danh sách chia sẻ.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+    @PutMapping("/share-wallet/{id}")
+    public ResponseEntity<?> updateWalletRole(@PathVariable("id") Long walletId,
+                                              @RequestParam("userId") Long userId,
+                                              @RequestParam("role") WalletRole walletRoleName) {
+        try {
+            System.out.println("walletId: " + walletId);
+            System.out.println("userId: " + userId);
+            System.out.println("role: " + walletRoleName);
+            walletService.updateWalletRole(walletId, userId, walletRoleName);
+            return new ResponseEntity<>("Cập nhật quyền thành công", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Lỗi xảy ra: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
     @PostMapping("/transfer/{fromWalletId}/{toWalletId}/{amount}")
     public ResponseEntity<String> transferMoney(
             @PathVariable(value = "fromWalletId", required = false) Long fromWalletId,
