@@ -105,13 +105,14 @@ public class TransactionServiceImpl implements ITransactionService {
                 BigDecimal newAmount = oldWallet.getAmount().add(transaction.getAmount()).add(transactionDto.getAmount());
                 wallet.setAmount(newAmount);
             }
+            walletRepository.save(wallet);
+
         }else{
             // old la thu - new la chi
             if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
                 BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
                 BigDecimal newAmount = wallet.getAmount().subtract(transactionDto.getAmount());
                 oldWallet.setAmount(oldAmount);
-                walletRepository.save(oldWallet);
                 wallet.setAmount(newAmount);
 
             }
@@ -120,7 +121,6 @@ public class TransactionServiceImpl implements ITransactionService {
                 BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
                 BigDecimal newAmount = wallet.getAmount().add(transactionDto.getAmount());
                 oldWallet.setAmount(oldAmount);
-                walletRepository.save(oldWallet);
                 wallet.setAmount(newAmount);
 
             }
@@ -129,7 +129,6 @@ public class TransactionServiceImpl implements ITransactionService {
                 BigDecimal oldAmount = oldWallet.getAmount().add(transaction.getAmount());
                 BigDecimal newAmount = wallet.getAmount().subtract(transactionDto.getAmount());
                 oldWallet.setAmount(oldAmount);
-                walletRepository.save(oldWallet);
                 wallet.setAmount(newAmount);
 
             }
@@ -138,10 +137,12 @@ public class TransactionServiceImpl implements ITransactionService {
                 BigDecimal oldAmount = oldWallet.getAmount().add(transaction.getAmount());
                 BigDecimal newAmount = wallet.getAmount().add(transactionDto.getAmount());
                 oldWallet.setAmount(oldAmount);
-                walletRepository.save(oldWallet);
                 wallet.setAmount(newAmount);
 
             }
+            walletRepository.save(oldWallet);
+            walletRepository.save(wallet);
+
         }
         transaction.setNote(transactionDto.getNote());
         transaction.setAmount(transactionDto.getAmount());
@@ -149,7 +150,6 @@ public class TransactionServiceImpl implements ITransactionService {
         transaction.setCategory(category);
         transaction.setWallet(wallet);
 
-        walletRepository.save(wallet);
         transactionRepository.save(transaction);
 
     }
