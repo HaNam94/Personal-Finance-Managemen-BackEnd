@@ -32,8 +32,18 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     @Override
-    public Transaction findTransactionById(Long id) {
-        return transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
+    public TransactionDto findTransactionById(Long id) {
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
+        TransactionDto dto =TransactionDto.builder()
+                .id(transaction.getId())
+                .categoryId(transaction.getCategory().getId())
+                .walletId(transaction.getWallet().getId())
+                .amount(transaction.getAmount())
+                .datetime(transaction.getDatetime())
+                .note(transaction.getNote())
+                .categoryType(transaction.getCategory().getCategoryType())
+                .build();
+        return dto;
     }
 
     @Override

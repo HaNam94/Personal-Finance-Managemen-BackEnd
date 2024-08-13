@@ -55,8 +55,8 @@ public class TransactionController {
         return ResponseEntity.ok().body(transactionDto);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateTransaction(@PathVariable Long id, @Valid @ModelAttribute TransactionDto transactionDto, BindingResult bindingResult) {
+    @PostMapping("/{id}")
+    public ResponseEntity<?> updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -72,5 +72,9 @@ public class TransactionController {
         public ResponseEntity<?> deleteTransaction(@PathVariable Long id) {
         transactionService.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getTransactionById(@PathVariable Long id) {
+        return new ResponseEntity<>(transactionService.findTransactionById(id), HttpStatus.OK);
     }
 }
