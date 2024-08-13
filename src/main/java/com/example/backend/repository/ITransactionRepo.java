@@ -1,6 +1,7 @@
 package com.example.backend.repository;
 
 import com.example.backend.dto.TransactionInfoDto;
+import com.example.backend.dto.TransactionSimpleDto;
 import com.example.backend.model.entity.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,6 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
     void deleteTransactionByUserId(Long userId);
     @Query(value = "SELECT t.id, t.note, t.amount, t.datetime,c.icon, c.category_type, c.category_name, w.wallet_name  FROM transaction t join category c on t.category_id = c.id join wallet w on t.wallet_id = w.id   WHERE t.user_id = :userId" ,nativeQuery = true)
     List<TransactionInfoDto> findAllTransactionByUserId(Long userId);
+
+    List<TransactionSimpleDto> findAllByUserIdAndCategoryId(Long categoryId, Long userId);
 }
