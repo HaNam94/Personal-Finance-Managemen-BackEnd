@@ -8,10 +8,13 @@ import com.example.backend.model.entity.Wallet;
 import com.example.backend.model.entity.WalletUserRole;
 import com.example.backend.repository.IUserRepo;
 import com.example.backend.repository.IWalletRepo;
+import com.example.backend.repository.IWalletUserRolesRepo;
 import com.example.backend.service.IWalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ public class WalletServiceImpl implements IWalletService {
     private IWalletRepo walletRepository;
     @Autowired
     private IUserRepo userRepository;
+    @Autowired
+    private IWalletUserRolesRepo walletUserRolesRepo;
 
 
 
@@ -144,8 +149,34 @@ public class WalletServiceImpl implements IWalletService {
             wallet.getWalletRoles().add(walletUserRole);
             walletRepository.save(wallet);
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi trong quá trình chia sẻ ví: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
+    }
+    public void removeWalletShare(Long walletId, String email) {
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ví"));
+
+        User user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+
+        WalletUserRole walletUserRole = wallet.getWalletRoles().stream()
+                .filter(role -> role.getUser().getId().equals(user.getId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Người dùng không có quyền chia sẻ ví"));
+
+        wallet.getWalletRoles().remove(walletUserRole);
+        walletRepository.save(wallet);
+    }
+
+    @Override
+    public void updateWalletRole(Long walletId, Long userId, WalletRole walletRoleName) {
+       WalletUserRole walletUserRole = walletUserRolesRepo.findWalletUserRoleByWalletIdAndUserId(walletId,userId);
+       if(walletUserRole == null){
+           throw new RuntimeException("not found");
+
+       }
+       walletUserRole.setRole(walletRoleName);
+       walletUserRolesRepo.save(walletUserRole);
     }
 
 }

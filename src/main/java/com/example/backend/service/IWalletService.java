@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.dto.response.ResponseSuccess;
+import com.example.backend.model.WalletRole;
 import com.example.backend.model.entity.Wallet;
 import com.example.backend.security.principals.CustomUserDetails;
 
@@ -30,5 +31,7 @@ public interface IWalletService {
     Set<WalletInfoDto> findAllWalletByUserId(Long id);
 
     void shareWallet(Long walletId, String email, String walletRoleName);
+    void removeWalletShare(Long walletId, String email);
+    void updateWalletRole(Long walletId, Long userId, WalletRole walletRoleName);
 
 }
