@@ -48,4 +48,18 @@ public class CategoryServiceImpl implements ICategoryService {
         }
         categoryRepo.save(category);
     }
+
+    @Override
+    public CategoryDto findCategoryById(Long id) {
+        return categoryRepo.findCategoryById(id).orElse(null);
+    }
+
+    @Override
+    public void updateCategory(Long id, CategoryFormDto categoryFormDto) {
+        Category category = categoryRepo.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
+        category.setCategoryName(categoryFormDto.getCategoryName());
+        category.setNote(categoryFormDto.getNote());
+        category.setIcon(categoryFormDto.getIcon());
+        categoryRepo.save(category);
+    }
 }

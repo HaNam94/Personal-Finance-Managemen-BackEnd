@@ -9,4 +9,8 @@ public interface ICategoryService {
     void deleteCategory(Long id, Long id1);
 
     void saveCategory(CategoryFormDto categoryFormDto, Long id);
+
+    CategoryDto findCategoryById(Long id);
+
+    void updateCategory(Long id, CategoryFormDto categoryFormDto);
 }
