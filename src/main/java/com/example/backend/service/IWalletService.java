@@ -34,4 +34,5 @@ public interface IWalletService {
     void removeWalletShare(Long walletId, String email);
     void updateWalletRole(Long walletId, Long userId, WalletRole walletRoleName);
 
+    void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount);
 }

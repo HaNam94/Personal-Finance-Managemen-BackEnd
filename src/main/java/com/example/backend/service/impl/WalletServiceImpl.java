@@ -10,11 +10,15 @@ import com.example.backend.repository.IUserRepo;
 import com.example.backend.repository.IWalletRepo;
 import com.example.backend.repository.IWalletUserRolesRepo;
 import com.example.backend.service.IWalletService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -152,6 +156,7 @@ public class WalletServiceImpl implements IWalletService {
             throw new RuntimeException(e.getMessage());
         }
     }
+
     public void removeWalletShare(Long walletId, String email) {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy ví"));
@@ -177,6 +182,36 @@ public class WalletServiceImpl implements IWalletService {
        }
        walletUserRole.setRole(walletRoleName);
        walletUserRolesRepo.save(walletUserRole);
+
+    @Transactional
+    @Override
+    public void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount) {
+        Wallet fromWallet = walletRepository.findById(fromWalletId)
+                .orElseThrow(()-> new ResourceNotFoundException("Wallet not found"));
+        Wallet toWallet = walletRepository.findById(toWalletId)
+                .orElseThrow(()-> new ResourceNotFoundException("Wallet not found"));
+
+        if (fromWallet.getAmount().compareTo(amount) < 0) {
+            throw new InsufficientBalanceException("Insufficient balance in the source wallet");
+        }
+        fromWallet.setAmount(fromWallet.getAmount().subtract(amount));
+        toWallet.setAmount(toWallet.getAmount().add(amount));
+
+        walletRepository.save(fromWallet);
+        walletRepository.save(toWallet);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public class ResourceNotFoundException extends RuntimeException {
+        public ResourceNotFoundException(String message) {
+            super(message);
+        }
+    }
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public class InsufficientBalanceException extends RuntimeException {
+        public InsufficientBalanceException(String message) {
+            super(message);
+        }
+    }
+    
 }

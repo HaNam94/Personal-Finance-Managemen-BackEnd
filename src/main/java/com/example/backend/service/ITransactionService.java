@@ -2,7 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.TransactionDto;
 import com.example.backend.dto.TransactionInfoDto;
-
+import com.example.backend.dto.TransactionSimpleDto;
 import java.util.List;
 
 public interface ITransactionService {
@@ -16,4 +16,5 @@ public interface ITransactionService {
 
     void updateTransaction(Long id, TransactionDto transactionDto);
 
+    List<TransactionSimpleDto> searchTransactionWithUserId(Long id, Long categoryId);
 }

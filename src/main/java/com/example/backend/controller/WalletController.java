@@ -120,6 +120,7 @@ public class WalletController {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userService.findUserByEmail(userDetails.getUsername());
     }
+
     @DeleteMapping("/share-wallet/{walletId}")
     public ResponseEntity<?> removeWalletShare(
             @PathVariable Long walletId,
@@ -147,5 +148,17 @@ public class WalletController {
             return new ResponseEntity<>("Lỗi xảy ra: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+
+    @PostMapping("/transfer/{fromWalletId}/{toWalletId}/{amount}")
+    public ResponseEntity<String> transferMoney(
+            @PathVariable(value = "fromWalletId", required = false) Long fromWalletId,
+            @PathVariable(value = "toWalletId", required = false) Long toWalletId,
+            @PathVariable(value = "amount", required = false) BigDecimal amount) {
+
+        walletService.transferMoney(fromWalletId, toWalletId, amount);
+        return ResponseEntity.ok("Transfer successful");
+    }
+
 
 }
