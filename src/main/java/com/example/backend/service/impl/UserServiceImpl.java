@@ -53,6 +53,7 @@ public class UserServiceImpl implements IUserService {
     private final IWalletRepo walletRepository;
     private final ITransactionRepo transactionRepository;
     private final IBudgetRepo budgetRepository;
+    private final ICategoryRepo categoryRepository;
 
     @Value("${upload.path}")
     private String fileUpload;
@@ -94,12 +95,36 @@ public class UserServiceImpl implements IUserService {
         user.setRoles(roles);
         user.setOtpCode(otpCode);
         userRepository.save(user);
+        createDefaultCategory(user.getId());
         ResponseSuccess response = ResponseSuccess.builder()
                 .message("DK OK")
                 .build();
         return response;
 
     }
+    public void createDefaultCategory(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        Category incomeCategory = new Category();
+        incomeCategory.setCategoryName("Khoảng thu ");
+        incomeCategory.setCategoryType(1);
+        incomeCategory.setUser(user);
+        incomeCategory.setNote("Đây là phân loại thu mặc định");
+        incomeCategory.setIcon("icon_141");
+        incomeCategory.setIsDefault(true);
+
+        Category expenseCategory = new Category();
+        expenseCategory.setCategoryName("Khoảng chi");
+        expenseCategory.setCategoryType(0);
+        expenseCategory.setUser(user);
+        expenseCategory.setNote("Đây là phân loại chi mặc định");
+        expenseCategory.setIcon("icon_140");
+        expenseCategory.setIsDefault(true);
+
+        categoryRepository.save(incomeCategory);
+        categoryRepository.save(expenseCategory);
+    }
+
 
     public String verifyAccount(String email, String otp) {
 
