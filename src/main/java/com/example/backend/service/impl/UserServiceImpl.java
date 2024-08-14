@@ -239,20 +239,16 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public ResponseSuccess deleteUserById(Long userId) {
-        Set<WalletInfoDto> wallets = walletRepository.findAllByUserId(userId);
-        transactionRepository.deleteTransactionByUserId(userId);
-        wallets.forEach(wallet -> {
-            walletRepository.deleteWalletById(wallet.getId());
-        });
 
-        List<Budget> budgets = budgetRepository.getBudgetsByUserId(userId);
-        budgets.forEach(budget -> {
-            budgetRepository.deleteBudgetById(budget.getId());
-        });
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        userRepository.deleteUserById(userId);
+
+        userRepository.delete(user);
+
+      
         ResponseSuccess responseSuccess = new ResponseSuccess();
-        responseSuccess.setMessage("Delete success");
+        responseSuccess.setMessage("User và tất cả dữ liệu liên quan đã được xóa thành công.");
         responseSuccess.setStatus(HttpStatus.OK);
         return responseSuccess;
     }
