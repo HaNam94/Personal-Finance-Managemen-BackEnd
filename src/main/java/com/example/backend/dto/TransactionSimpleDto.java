@@ -15,4 +15,8 @@ public interface TransactionSimpleDto {
 
     @Value("#{target.category.categoryName}")
     String getCategoryName();
-}
+    @Value("#{target.category.categoryType}")
+    Integer getCategoryType();
+    @Value("#{target.wallet.walletName}")
+    String getWalletName();
+;}

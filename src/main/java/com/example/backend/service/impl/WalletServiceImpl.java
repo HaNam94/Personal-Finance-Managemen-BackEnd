@@ -79,9 +79,9 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void updateWalletAmount(Long id, BigDecimal newAmount) {
-        Wallet wallet = walletRepository.findById(id).orElseThrow(() -> new RuntimeException("Khong tim thay vi"));
-        wallet.setAmount(newAmount);
-        walletRepository.save(wallet);
+    Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new RuntimeException("Khong tim thay vi"));
+    wallet.setAmount(newAmount);
+    walletRepository.save(wallet);
     }
 
     @Override
@@ -116,15 +116,15 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void deleteWalletById(Long walletId) {
-        walletRepository.deleteById(walletId);
+            walletRepository.deleteById(walletId);
     }
+
 
 
     @Override
     public Set<WalletInfoDto> findAllWalletByUserId(Long id) {
         return walletRepository.findAllByUserId(id);
     }
-
     @Override
     public void shareWallet(Long walletId, String email, String walletRoleName) {
         try {
@@ -171,26 +171,27 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void updateWalletRole(Long walletId, Long userId, WalletRole walletRoleName) {
-        WalletUserRole walletUserRole = walletUserRolesRepo.findWalletUserRoleByWalletIdAndUserId(walletId, userId);
-        if (walletUserRole == null) {
-            throw new RuntimeException("not found");
+       WalletUserRole walletUserRole = walletUserRolesRepo.findWalletUserRoleByWalletIdAndUserId(walletId,userId);
+       if(walletUserRole == null){
+           throw new RuntimeException("not found");
 
-        }
-        walletUserRole.setRole(walletRoleName);
-        walletUserRolesRepo.save(walletUserRole);
+       }
+       walletUserRole.setRole(walletRoleName);
+       walletUserRolesRepo.save(walletUserRole);
+
     }
 
-    @Transactional
     @Override
     public void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount) {
         Wallet fromWallet = walletRepository.findById(fromWalletId)
-                .orElseThrow(() -> new NoSuchElementException("Wallet not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ví: " + fromWalletId));
         Wallet toWallet = walletRepository.findById(toWalletId)
-                .orElseThrow(() -> new NoSuchElementException("Wallet not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ví: " + toWalletId));
 
         if (fromWallet.getAmount().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient balance in the source wallet");
+            throw new RuntimeException("Số dư trong ví không đủ.");
         }
+
         fromWallet.setAmount(fromWallet.getAmount().subtract(amount));
         toWallet.setAmount(toWallet.getAmount().add(amount));
 
@@ -198,3 +199,4 @@ public class WalletServiceImpl implements IWalletService {
         walletRepository.save(toWallet);
     }
 }
+
