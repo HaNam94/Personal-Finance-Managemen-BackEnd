@@ -36,20 +36,11 @@ public class TransactionServiceImpl implements ITransactionService {
     @Override
     public TransactionDto findTransactionById(Long id) {
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
-        TransactionDto dto =TransactionDto.builder()
-                .id(transaction.getId())
-                .categoryId(transaction.getCategory().getId())
-                .walletId(transaction.getWallet().getId())
-                .amount(transaction.getAmount())
-                .datetime(transaction.getDatetime())
-                .note(transaction.getNote())
-                .categoryType(transaction.getCategory().getCategoryType())
-                .build();
-        return dto;
+        return convertToDTO(transaction);
     }
 
     @Override
-    public void save(Long userId,TransactionDto transactionDto) {
+    public TransactionDto save(Long userId, TransactionDto transactionDto) {
         Category category = categoryRepository.findById(transactionDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
         Wallet wallet = walletRepository.findById(transactionDto.getWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
@@ -67,7 +58,19 @@ public class TransactionServiceImpl implements ITransactionService {
             wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
         }
         walletRepository.save(wallet);
-        transactionRepository.save(transaction);
+        return convertToDTO(transactionRepository.save(transaction));
+    }
+
+    public TransactionDto convertToDTO(Transaction transaction) {
+        TransactionDto dto = new TransactionDto();
+        dto.setId(transaction.getId());
+        dto.setCategoryId(transaction.getCategory().getId());
+        dto.setWalletId(transaction.getWallet().getId());
+        dto.setAmount(transaction.getAmount());
+        dto.setNote(transaction.getNote());
+        dto.setDatetime(transaction.getDatetime());
+        dto.setCategoryType(transaction.getCategory().getCategoryType());
+        return dto;
     }
 
     @Override

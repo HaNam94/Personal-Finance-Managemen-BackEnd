@@ -11,6 +11,11 @@ public class BackendApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BackendApplication.class, args);
+		System.out.println("=================== Backend Application ===================");
+		System.out.println();
+		System.out.println("\t\t\thttp://localhost:8080");
+		System.out.println();
+		System.out.println("===========================================================");
 	}
 	@Bean
 	public PasswordEncoder passwordEncoder(){
