@@ -187,12 +187,12 @@ public class WalletServiceImpl implements IWalletService {
     @Override
     public void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount) {
         Wallet fromWallet = walletRepository.findById(fromWalletId)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ví: " + fromWalletId));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ví: " + fromWalletId));
         Wallet toWallet = walletRepository.findById(toWalletId)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy ví: " + toWalletId));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ví: " + toWalletId));
 
         if (fromWallet.getAmount().compareTo(amount) < 0) {
-            throw new InsufficientBalanceException("Số dư trong ví không đủ.");
+            throw new RuntimeException("Số dư trong ví không đủ.");
         }
 
         fromWallet.setAmount(fromWallet.getAmount().subtract(amount));
@@ -200,18 +200,6 @@ public class WalletServiceImpl implements IWalletService {
 
         walletRepository.save(fromWallet);
         walletRepository.save(toWallet);
-    }
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public class ResourceNotFoundException extends RuntimeException {
-        public ResourceNotFoundException(String message) {
-            super(message);
-        }
-    }
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public class InsufficientBalanceException extends RuntimeException {
-        public InsufficientBalanceException(String message) {
-            super(message);
-        }
     }
 }
 
