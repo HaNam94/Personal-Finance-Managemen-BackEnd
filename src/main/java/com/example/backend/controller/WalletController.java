@@ -104,11 +104,10 @@ public class WalletController {
                                          @RequestParam("email") String email,
                                          @RequestParam("role") String walletRoleName) {
         try {
-            System.out.println("walletId: " + walletId);
-            System.out.println("email: " + email);
-            System.out.println("role: " + walletRoleName);
+            UserDto userDto = getUserDto(authentication);
             walletService.shareWallet(walletId, email, walletRoleName);
-            return new ResponseEntity<>("{}", HttpStatus.OK);
+            WalletInfoDto walletDto = walletService.getWalletWithPermission(walletId, userDto.getId());
+            return new ResponseEntity<>(walletDto, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Lỗi xảy ra: " + e.getMessage(), HttpStatus.BAD_REQUEST);
