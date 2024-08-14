@@ -4,7 +4,6 @@ import com.example.backend.dto.TransactionDto;
 import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.dto.TransactionSimpleDto;
 import com.example.backend.dto.UserDto;
-import com.example.backend.model.entity.Transaction;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.ITransactionService;
 import com.example.backend.service.IUserService;
@@ -17,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,31 +28,30 @@ import java.util.Map;
 public class TransactionController {
     private final ITransactionService transactionService;
     private final IUserService userService;
+
     private UserDto getUserDto(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return userService.findUserByEmail(userDetails.getUsername());
     }
 
-    @GetMapping("")
-    public  ResponseEntity<?> getAllTransactions(Authentication authentication) {
-        UserDto user =  getUserDto(authentication);
-       List<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId());
-        return ResponseEntity.ok().body(transactions);
+    @GetMapping
+    public ResponseEntity<?> getAllTransactions(Authentication authentication) {
+        UserDto user = getUserDto(authentication);
+        List<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId());
+        return ResponseEntity.ok(transactions);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addTransaction(@Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult, Authentication authentication) {
+    @PostMapping
+    public ResponseEntity<?> addTransaction(@Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult, Principal principal) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
-           for (FieldError error : bindingResult.getFieldErrors()) {
-               errors.put(error.getField(), error.getDefaultMessage());
-           }
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
             return ResponseEntity.badRequest().body(errors);
         }
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        UserDto user =  userService.findUserByEmail(customUserDetails.getEmail());
-        transactionService.save(user.getId(),transactionDto);
-        return ResponseEntity.ok().body(transactionDto);
+        UserDto user = userService.findUserByEmail(principal.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.save(user.getId(), transactionDto));
     }
 
     @PostMapping("/{id}")
@@ -69,9 +68,9 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-        public ResponseEntity<?> deleteTransaction(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTransaction(@PathVariable Long id) {
         transactionService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
@@ -79,10 +78,11 @@ public class TransactionController {
             @RequestParam Long categoryId,
             Authentication authentication
     ) {
-        UserDto user =  getUserDto(authentication);
+        UserDto user = getUserDto(authentication);
         List<TransactionSimpleDto> transactions = transactionService.searchTransactionWithUserId(user.getId(), categoryId);
         return ResponseEntity.ok().body(transactions);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getTransactionById(@PathVariable Long id) {
         return new ResponseEntity<>(transactionService.findTransactionById(id), HttpStatus.OK);

@@ -21,20 +21,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class WalletServiceImpl implements IWalletService {
-    @Autowired
-    private IWalletRepo walletRepository;
-    @Autowired
-    private IUserRepo userRepository;
-    @Autowired
-    private IWalletUserRolesRepo walletUserRolesRepo;
+
+    private final IWalletRepo walletRepository;
+
+    private final IUserRepo userRepository;
+
+    private final IWalletUserRolesRepo walletUserRolesRepo;
 
 
     @Override
@@ -82,9 +79,9 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void updateWalletAmount(Long id, BigDecimal newAmount) {
-        Wallet wallet = walletRepository.findById(id).orElseThrow(() -> new RuntimeException("Khong tim thay vi"));
-        wallet.setAmount(newAmount);
-        walletRepository.save(wallet);
+    Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new RuntimeException("Khong tim thay vi"));
+    wallet.setAmount(newAmount);
+    walletRepository.save(wallet);
     }
 
     @Override
@@ -119,15 +116,15 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void deleteWalletById(Long walletId) {
-        walletRepository.deleteById(walletId);
+            walletRepository.deleteById(walletId);
     }
+
 
 
     @Override
     public Set<WalletInfoDto> findAllWalletByUserId(Long id) {
         return walletRepository.findAllByUserId(id);
     }
-
     @Override
     public void shareWallet(Long walletId, String email, String walletRoleName) {
         try {
@@ -174,13 +171,13 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void updateWalletRole(Long walletId, Long userId, WalletRole walletRoleName) {
-        WalletUserRole walletUserRole = walletUserRolesRepo.findWalletUserRoleByWalletIdAndUserId(walletId, userId);
-        if (walletUserRole == null) {
-            throw new RuntimeException("not found");
+       WalletUserRole walletUserRole = walletUserRolesRepo.findWalletUserRoleByWalletIdAndUserId(walletId,userId);
+       if(walletUserRole == null){
+           throw new RuntimeException("not found");
 
-        }
-        walletUserRole.setRole(walletRoleName);
-        walletUserRolesRepo.save(walletUserRole);
+       }
+       walletUserRole.setRole(walletRoleName);
+       walletUserRolesRepo.save(walletUserRole);
 
     }
 
