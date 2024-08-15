@@ -19,7 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,8 @@ public class TransactionServiceImpl implements ITransactionService {
         Pageable pageable = PageRequest.of(page, 10);
         return transactionRepository.findAllTransactionByUserId(userId, categoryId, categoryType, pageable);
     }
+
+
 
     @Override
     public TransactionDto findTransactionById(Long id) {
@@ -171,6 +176,14 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
 
+    @Override
+    public BigDecimal getTotalAmountToday(Long userId, Integer categoryType) {
 
+        Optional<BigDecimal> amount = transactionRepository.getTotalAmountToday(userId,categoryType, LocalDate.now());
+        if (amount.isEmpty()){
+            return BigDecimal.ZERO;
+        }
+        return amount.get();
+    }
 
 }

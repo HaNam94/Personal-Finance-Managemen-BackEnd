@@ -4,6 +4,7 @@ import com.example.backend.dto.TransactionDto;
 import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.dto.TransactionSimpleDto;
 import com.example.backend.dto.UserDto;
+import com.example.backend.model.entity.User;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.ITransactionService;
 import com.example.backend.service.IUserService;
@@ -18,6 +19,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,5 +96,9 @@ public class TransactionController {
         return new ResponseEntity<>(transactionService.findTransactionById(id), HttpStatus.OK);
     }
 
-
+    @GetMapping("/all-amount-today/{categoryType}")
+    public ResponseEntity<?> getAllMountToday(@PathVariable("categoryType") Integer categoryType, Authentication authentication) {
+        UserDto userDto = getUserDto(authentication);
+        return new ResponseEntity<>(transactionService.getTotalAmountToday(userDto.getId(), categoryType), HttpStatus.OK);
+    }
 }
