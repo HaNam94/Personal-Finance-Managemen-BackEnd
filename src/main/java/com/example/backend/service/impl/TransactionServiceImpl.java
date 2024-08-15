@@ -19,7 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,7 @@ public class TransactionServiceImpl implements ITransactionService {
         Pageable pageable = PageRequest.of(page, 10);
         return transactionRepository.findAllTransactionByUserId(userId, categoryId, categoryType, pageable);
     }
+
 
     @Override
     public TransactionDto findTransactionById(Long id) {
@@ -58,7 +62,7 @@ public class TransactionServiceImpl implements ITransactionService {
                 .build();
         if (transaction.getCategory().getCategoryType() == 1) {
             wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
-        }else if (transaction.getCategory().getCategoryType() == 0) {
+        } else if (transaction.getCategory().getCategoryType() == 0) {
 
             wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
         }
@@ -118,7 +122,7 @@ public class TransactionServiceImpl implements ITransactionService {
             }
             walletRepository.save(wallet);
 
-        }else{
+        } else {
             // old la thu - new la chi
             if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
                 BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
@@ -171,6 +175,32 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
 
+    @Override
+    public BigDecimal statisticalTotalAmountTodayByCategoryType(Long userId, Integer categoryType) {
 
+        Optional<BigDecimal> amount = transactionRepository.getTotalAmountTodayByCategoryType(userId, categoryType, LocalDate.now());
+        if (amount.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return amount.get();
+    }
+
+    @Override
+    public BigDecimal statisticalTotalAmountByTypeAndTime(Integer type, LocalDate fromDate, LocalDate toDate, Long userId) {
+        Optional<BigDecimal> amount = transactionRepository.getTotalAmountByTypeAndTime(type, fromDate, toDate, userId);
+        if (amount.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return amount.get();
+    }
+
+    @Override
+    public BigDecimal statisticalAmountTodayByWalletId(Integer categoryType, Long walletId) {
+        Optional<BigDecimal> amount = transactionRepository.statisticalAmountTodayByWalletId(categoryType, walletId, LocalDate.now());
+        if (amount.isEmpty()){
+            return BigDecimal.ZERO;
+        }
+        return amount.get();
+    }
 
 }

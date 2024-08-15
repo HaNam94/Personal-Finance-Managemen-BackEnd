@@ -5,6 +5,8 @@ import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.dto.TransactionSimpleDto;
 import org.springframework.data.domain.Page;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ITransactionService {
@@ -20,4 +22,10 @@ public interface ITransactionService {
     List<TransactionSimpleDto> searchTransactionWithUserId(Long id, Long categoryId);
 
     Page<TransactionInfoDto> findAllTransactionByUserId(Long id, Long categoryId, Integer categoryType, int page);
+
+    BigDecimal statisticalTotalAmountTodayByCategoryType(Long userId, Integer categoryType);
+
+    BigDecimal statisticalTotalAmountByTypeAndTime(Integer type, LocalDate fromDate, LocalDate toDate, Long id);
+
+    BigDecimal statisticalAmountTodayByWalletId(Integer categoryType, Long walletId);
 }

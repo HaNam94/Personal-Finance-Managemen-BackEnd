@@ -17,7 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,5 +94,24 @@ public class TransactionController {
         return new ResponseEntity<>(transactionService.findTransactionById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/statistical-amount-today/{categoryType}")
+    public ResponseEntity<?>statisticalAmountToday(@PathVariable("categoryType") Integer categoryType, Authentication authentication) {
+        UserDto userDto = getUserDto(authentication);
+        return new ResponseEntity<>(transactionService.statisticalTotalAmountTodayByCategoryType(userDto.getId(), categoryType), HttpStatus.OK);
+    }
 
+    @GetMapping("/statistical-amount-by-time")
+    public ResponseEntity<?> statisticalAmountTodayByTime(@RequestParam("categoryType") Integer type,
+                                                         @RequestParam("fromDate") LocalDate fromDate,
+                                                         @RequestParam("toDate") LocalDate toDate,
+                                                         Authentication authentication) {
+        UserDto userDto = getUserDto(authentication);
+        return new ResponseEntity<>(transactionService.statisticalTotalAmountByTypeAndTime(type, fromDate, toDate, userDto.getId()),HttpStatus.OK);
+    }
+
+    @GetMapping("/statistical-amount-today-by-walletId/{type}/{walletId}")
+    public ResponseEntity<?> statisticalAmountTodayByWalletId(@PathVariable("type") Integer categoryType,
+                                                              @PathVariable("walletId") Long walletId){
+        return new ResponseEntity<>(transactionService.statisticalAmountTodayByWalletId(categoryType,walletId),HttpStatus.OK);
+    }
 }
