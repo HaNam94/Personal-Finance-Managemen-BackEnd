@@ -49,5 +49,15 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
             "FROM Transaction t " +
             "WHERE t.category.categoryType = :categoryType " +
             "AND t.wallet.id = :walletId AND t.datetime = :time")
-    Optional<BigDecimal> statisticalAmountTodayByWalletId(Integer categoryType, Long walletId, LocalDate time);
+    Optional<BigDecimal> statisticalAmountTodayByWalletId(@Param("categoryType") Integer categoryType,
+                                                          @Param("walletId") Long walletId,
+                                                          @Param("time") LocalDate time);
+    @Query("SELECT SUM(t.amount) " +
+            "FROM Transaction t " +
+            "WHERE t.category.categoryType = :categoryType " +
+            "AND t.wallet.id = :walletId AND t.datetime BETWEEN :fromDate AND :toDate")
+    Optional<BigDecimal> statisticalAmountByWalletIdAndTime(@Param("categoryType") Integer categoryType,
+                                                            @Param("walletId") Long walletId,
+                                                            @Param("fromDate") LocalDate fromDate,
+                                                            @Param("toDate") LocalDate toDate);
 }

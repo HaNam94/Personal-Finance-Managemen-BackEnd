@@ -114,4 +114,12 @@ public class TransactionController {
                                                               @PathVariable("walletId") Long walletId){
         return new ResponseEntity<>(transactionService.statisticalAmountTodayByWalletId(categoryType,walletId),HttpStatus.OK);
     }
+
+    @GetMapping("/statistical-amount-by-walletId-and-time")
+    public ResponseEntity<?> statisticalAmountByWalletIdAndTime(@RequestParam("type") Integer categoryType,
+                                                                @RequestParam("walletId") Long walletId,
+                                                                @RequestParam("fromDate") LocalDate fromDate,
+                                                                @RequestParam("toDate") LocalDate toDate){
+        return new ResponseEntity<>(transactionService.statisticalAmountByWalletIdAndTime(categoryType,walletId,fromDate,toDate),HttpStatus.OK);
+    }
 }
