@@ -10,14 +10,8 @@ import com.example.backend.repository.IUserRepo;
 import com.example.backend.repository.IWalletRepo;
 import com.example.backend.repository.IWalletUserRolesRepo;
 import com.example.backend.service.IWalletService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 import java.math.BigDecimal;
@@ -197,6 +191,15 @@ public class WalletServiceImpl implements IWalletService {
 
         walletRepository.save(fromWallet);
         walletRepository.save(toWallet);
+    }
+
+    @Override
+    public BigDecimal getTotalAmount(Long userId) {
+        Optional<BigDecimal> totalAmount = walletRepository.getTotalAmountByUserId(userId);
+        if (totalAmount.isEmpty()){
+            return BigDecimal.ZERO;
+        }
+        return totalAmount.get();
     }
 }
 

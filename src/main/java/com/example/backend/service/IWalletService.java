@@ -2,15 +2,11 @@ package com.example.backend.service;
 
 import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.WalletInfoDto;
-import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.model.WalletRole;
 import com.example.backend.model.entity.Wallet;
-import com.example.backend.security.principals.CustomUserDetails;
 
 import java.math.BigDecimal;
 import java.util.Set;
-
-import java.util.List;
 
 public interface IWalletService {
     Wallet saveWallet(Long ownerId, WalletDto walletDto);
@@ -35,4 +31,5 @@ public interface IWalletService {
     void updateWalletRole(Long walletId, Long userId, WalletRole walletRoleName);
 
     void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount);
+    BigDecimal getTotalAmount(Long userId);
 }

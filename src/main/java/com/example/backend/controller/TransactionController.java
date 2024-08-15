@@ -48,7 +48,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addTransaction(@Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult, Principal principal) {
+    public ResponseEntity<?> addTransaction(@Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult, Authentication authentication) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -56,11 +56,11 @@ public class TransactionController {
             }
             return ResponseEntity.badRequest().body(errors);
         }
-        UserDto user = userService.findUserByEmail(principal.getName());
+        UserDto user = getUserDto(authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(transactionService.save(user.getId(), transactionDto));
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateTransaction(@PathVariable Long id, @Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -93,4 +93,6 @@ public class TransactionController {
     public ResponseEntity<?> getTransactionById(@PathVariable Long id) {
         return new ResponseEntity<>(transactionService.findTransactionById(id), HttpStatus.OK);
     }
+
+
 }

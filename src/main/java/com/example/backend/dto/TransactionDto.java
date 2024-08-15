@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @Builder
 public class TransactionDto {
     private Long id;
-
     private String note;
     private BigDecimal amount;
     private LocalDate datetime;

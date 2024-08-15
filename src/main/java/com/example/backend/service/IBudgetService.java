@@ -10,6 +10,7 @@ public interface IBudgetService {
     List<Budget> findAllBudgets();
     Budget save(BudgetDto budgetDto, CustomUserDetails customUserDetails) throws NoSuchFieldException;
     Budget findBudgetById(Long id);
-    void deleteBudgetById(Long id);
+    void deleteBudgetById(Long id) throws NoSuchFieldException;
+    Budget updateBudget(Long id, BudgetDto budgetDto) throws NoSuchFieldException;
 
 }

@@ -59,6 +59,7 @@ public class TransactionServiceImpl implements ITransactionService {
         if (transaction.getCategory().getCategoryType() == 1) {
             wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
         }else if (transaction.getCategory().getCategoryType() == 0) {
+
             wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
         }
         walletRepository.save(wallet);
@@ -86,10 +87,13 @@ public class TransactionServiceImpl implements ITransactionService {
     public void updateTransaction(Long id, TransactionDto transactionDto) {
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
         Category category = categoryRepository.findById(transactionDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
+        Long a = transaction.getWallet().getId();
+        Long b = transactionDto.getWalletId();
         Wallet wallet = walletRepository.findById(transactionDto.getWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
 
-        Category oldCategory = categoryRepository.findById(transaction.getCategory().getId()).orElseThrow(() -> new RuntimeException("Category not found"));
         Wallet oldWallet = walletRepository.findById(transaction.getWallet().getId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+
         if (wallet.getId() == oldWallet.getId()) {
             // old la thu - new la chi
             if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
@@ -165,4 +169,8 @@ public class TransactionServiceImpl implements ITransactionService {
     public List<TransactionSimpleDto> searchTransactionWithUserId(Long userId, Long categoryId) {
         return transactionRepository.findAllByUserIdAndCategoryId(userId, categoryId);
     }
+
+
+
+
 }
