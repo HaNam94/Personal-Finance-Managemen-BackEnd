@@ -22,15 +22,12 @@ public class Transaction {
     private BigDecimal amount;
     private LocalDate datetime;
     @ManyToOne(fetch = FetchType.EAGER)
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
-    @ManyToOne(fetch = FetchType.EAGER)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "wallet_id")
 
     private Wallet wallet;
-    @ManyToOne(fetch = FetchType.EAGER)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
