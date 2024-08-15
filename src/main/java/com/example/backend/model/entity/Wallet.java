@@ -26,6 +26,6 @@ public class Wallet {
 
     @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WalletUserRole> walletRoles = new HashSet<>();
-
-
+    @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Transaction> transactions = new HashSet<>();
 }
