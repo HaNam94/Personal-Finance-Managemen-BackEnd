@@ -9,6 +9,7 @@ import com.example.backend.service.ITransactionService;
 import com.example.backend.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -35,9 +36,14 @@ public class TransactionController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllTransactions(Authentication authentication) {
+    public ResponseEntity<?> getAllTransactions(
+            Authentication authentication,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Integer categoryType,
+            @RequestParam(defaultValue = "0") int page
+    ) {
         UserDto user = getUserDto(authentication);
-        List<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId());
+        Page<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId(), categoryId, categoryType, page);
         return ResponseEntity.ok(transactions);
     }
 
