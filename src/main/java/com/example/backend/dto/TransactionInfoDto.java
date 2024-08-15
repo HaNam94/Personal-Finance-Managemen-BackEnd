@@ -9,10 +9,12 @@ public interface TransactionInfoDto {
     Long getId();
     String getNote();
     BigDecimal getAmount();
-    @JsonFormat(pattern="dd-MM-yyyy")
+//    @JsonFormat(pattern="dd-MM-yyyy")
     LocalDate getDatetime();
     String getIcon();
     Integer getCategoryType();
     String getCategoryName();
     String getWalletName();
+    Long getCategoryId();
+    Long getWalletId();
 }

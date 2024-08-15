@@ -159,5 +159,8 @@ public class WalletController {
         return ResponseEntity.ok("Transfer successful");
     }
 
-
+    @GetMapping("/total-amount/{userId}")
+    public ResponseEntity<?> getTotalAmount(@PathVariable Long userId){
+        return new ResponseEntity<>(walletService.getTotalAmount(userId),HttpStatus.OK);
+    }
 }
