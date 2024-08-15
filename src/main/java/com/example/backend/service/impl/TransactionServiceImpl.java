@@ -13,6 +13,9 @@ import com.example.backend.repository.IUserRepo;
 import com.example.backend.repository.IWalletRepo;
 import com.example.backend.service.ITransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,8 +32,9 @@ public class TransactionServiceImpl implements ITransactionService {
 
 
     @Override
-    public List<TransactionInfoDto> findAllTransactionByUserId(Long userId) {
-        return transactionRepository.findAllTransactionByUserId(userId);
+    public Page<TransactionInfoDto> findAllTransactionByUserId(Long userId, Long categoryId, Integer categoryType, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return transactionRepository.findAllTransactionByUserId(userId, categoryId, categoryType, pageable);
     }
 
     @Override
