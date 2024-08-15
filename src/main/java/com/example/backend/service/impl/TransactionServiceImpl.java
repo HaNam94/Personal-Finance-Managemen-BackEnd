@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -201,6 +200,14 @@ public class TransactionServiceImpl implements ITransactionService {
             return BigDecimal.ZERO;
         }
         return amount.get();
+    }
+
+    @Override
+    public BigDecimal statisticalAmountByWalletIdAndTime(Integer categoryType, Long walletId, LocalDate fromDate, LocalDate toDate) {
+        Optional<BigDecimal> amount = transactionRepository.statisticalAmountByWalletIdAndTime(categoryType, walletId, fromDate, toDate);
+        if (amount.isEmpty()) return BigDecimal.ZERO;
+        return amount.get();
+
     }
 
 }

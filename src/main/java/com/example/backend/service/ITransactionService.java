@@ -28,4 +28,6 @@ public interface ITransactionService {
     BigDecimal statisticalTotalAmountByTypeAndTime(Integer type, LocalDate fromDate, LocalDate toDate, Long id);
 
     BigDecimal statisticalAmountTodayByWalletId(Integer categoryType, Long walletId);
+
+    BigDecimal statisticalAmountByWalletIdAndTime(Integer categoryType, Long walletId, LocalDate fromDate, LocalDate toDate);
 }
