@@ -28,8 +28,25 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
                                                         Pageable pageable);
 
     List<TransactionSimpleDto> findAllByUserIdAndCategoryId(Long categoryId, Long userId);
-    @Query("SELECT SUM(t.amount) AS totalAmount FROM Transaction t JOIN t.category c WHERE t.user.id = :userId and c.categoryType = :categoryType AND t.datetime = :datetime")
-    Optional<BigDecimal> getTotalAmountToday(@Param("userId") Long userId,
-                                              @Param("categoryType") Integer categoryType,
-                                              @Param("datetime") LocalDate datetime);
+
+    @Query("SELECT SUM(t.amount) AS totalAmount " +
+            "FROM Transaction t " +
+            "WHERE t.user.id = :userId and t.category.categoryType = :categoryType AND t.datetime = :datetime")
+    Optional<BigDecimal> getTotalAmountTodayByCategoryType(@Param("userId") Long userId,
+                                                           @Param("categoryType") Integer categoryType,
+                                                           @Param("datetime") LocalDate datetime);
+
+    @Query("SELECT SUM(t.amount) " +
+            "FROM Transaction  t " +
+            "WHERE t.user.id = :userId AND t.category.categoryType = :type " +
+            "AND t.datetime BETWEEN :fromDate AND :toDate")
+    Optional<BigDecimal> getTotalAmountByTypeAndTime(@Param("type") Integer type,
+                                                     @Param("fromDate") LocalDate fromDate,
+                                                     @Param("toDate") LocalDate toDate,
+                                                     @Param("userId") Long userId);
+    @Query("SELECT SUM(t.amount) " +
+            "FROM Transaction t " +
+            "WHERE t.category.categoryType = :categoryType " +
+            "AND t.wallet.id = :walletId AND t.datetime = :time")
+    Optional<BigDecimal> statisticalAmountTodayByWalletId(Integer categoryType, Long walletId, LocalDate time);
 }
