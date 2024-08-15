@@ -39,10 +39,30 @@ public class BudgetServiceImpl implements IBudgetService {
 
         List<Category> categories = categoryRepository.findAll();
         budget.setCategory(categories);
+
         User user = userRepository.findUserByEmail(customUserDetails.getEmail()).orElseThrow(() -> new NoSuchFieldException("User not found"));
         budget.setUser(user);
+
+        if(budgetDto.getBudgetAmount().compareTo(budget.getBudgetAmount()) > 0){
+            throw new RuntimeException ("Số tiền chi tiêu vượt quá ngân sách đã đặt!");
+        }
+
         budgetRepository.save(budget);
         return null;
+    }
+
+    @Override
+    public Budget updateBudget(Long id, BudgetDto budgetDto) throws NoSuchFieldException{
+        Budget existingBudget = budgetRepository.findById(id)
+                .orElseThrow(() -> new NoSuchFieldException("Budget not found"));
+
+        existingBudget.setBudgetName(budgetDto.getBudgetName());
+        existingBudget.setBudgetType(budgetDto.getBudgetType());
+        existingBudget.setBudgetAmount(budgetDto.getBudgetAmount());
+        existingBudget.setBudgetDescription(budgetDto.getBudgetDescription());
+        existingBudget.setBudgetDate(LocalDate.now());
+
+        return budgetRepository.save(existingBudget);
     }
 
     @Override
@@ -50,8 +70,12 @@ public class BudgetServiceImpl implements IBudgetService {
         return null;
     }
 
-    @Override
-    public void deleteBudgetById(Long id) {
 
+    @Override
+    public void deleteBudgetById(Long id) throws NoSuchFieldException {
+        Budget existingBudget = budgetRepository.findById(id)
+                .orElseThrow(() -> new NoSuchFieldException("Budget not found"));
+
+        budgetRepository.delete(existingBudget);
     }
 }
