@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/budgets")
 @RequiredArgsConstructor
@@ -29,11 +31,11 @@ public class BudgetController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Budget> updateBudget(@PathVariable Long id,
-                                               @RequestBody BudgetDto budgetDto){
-        try{
+                                               @RequestBody BudgetDto budgetDto) {
+        try {
             Budget updatedBudget = budgetService.updateBudget(id, budgetDto);
             return new ResponseEntity<>(updatedBudget, HttpStatus.OK);
-        } catch (NoSuchFieldException e){
+        } catch (NoSuchFieldException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
@@ -47,4 +49,13 @@ public class BudgetController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/statistics/{year}/{month}")
+    public ResponseEntity<List<Budget>> getMonthlyBudgetStatistics(@PathVariable int year,
+                                                                   @PathVariable int month,
+                                                                   @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        List<Budget> monthlyBudgets = budgetService.getMonthlyBudgetStatistics(customUserDetails.getUserId(), year, month);
+        return new ResponseEntity<>(monthlyBudgets, HttpStatus.OK);
+    }
 }
+

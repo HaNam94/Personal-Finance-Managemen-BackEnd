@@ -78,4 +78,11 @@ public class BudgetServiceImpl implements IBudgetService {
 
         budgetRepository.delete(existingBudget);
     }
+
+    @Override
+    public List<Budget> getMonthlyBudgetStatistics(Long userId, int year, int month){
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        return budgetRepository.findBudgetsByUserIdAndDateRange(userId, startDate, endDate);
+    }
 }
