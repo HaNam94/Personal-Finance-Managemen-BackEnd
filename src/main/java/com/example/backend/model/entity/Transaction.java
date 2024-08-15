@@ -21,11 +21,11 @@ public class Transaction {
     private String note;
     private BigDecimal amount;
     private LocalDate datetime;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Category category;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Wallet wallet;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
 }
