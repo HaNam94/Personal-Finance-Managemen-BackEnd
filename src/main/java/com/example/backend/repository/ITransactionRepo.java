@@ -14,13 +14,26 @@ import java.util.List;
 
 @Repository
 public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
-//    @Query(value = "select tr_w.transaction_id from wallet w join  transaction tr on tr_w.wallets_id = :walletId",nativeQuery = true)
-//    List<Transaction> getTransactionsByWalletId(Long walletId);
+
 
     @Query(value = "delete from transaction where user_id = :userId", nativeQuery = true)
     void deleteTransactionByUserId(Long userId);
-//    @Query(value = "SELECT t.id, t.note, t.amount, t.datetime,c.icon, c.category_type, c.category_name, w.wallet_name  FROM transaction t join category c on t.category_id = c.id join wallet w on t.wallet_id = w.id   WHERE t.user_id = :userId" ,nativeQuery = true)
+
+//   @Query("SELECT t.id as id, " +
+//           "t.note as note, " +
+//           "t.amount as amount, " +
+//           "t.datetime as datetime, " +
+//           "c.icon as icon, " +
+//           "c.categoryType as categoryType, " +
+//           "c.categoryName as categoryName, " +
+//           "c.id as categoryId, " +
+//           "w.walletName as walletName," +
+//           "w.id as walletId  " +
+//           "FROM Transaction t JOIN  t.category c JOIN  t.wallet w  " +
+//           "WHERE t.user.id = :userId" )
 //    List<TransactionInfoDto> findAllTransactionByUserId(Long userId);
+////    @Query(value = "SELECT t.id, t.note, t.amount, t.datetime,c.icon, c.category_type, c.category_name, w.wallet_name  FROM transaction t join category c on t.category_id = c.id join wallet w on t.wallet_id = w.id   WHERE t.user_id = :userId" ,nativeQuery = true)
+////    List<TransactionInfoDto> findAllTransactionByUserId(Long userId);
     @Query("SELECT t FROM Transaction t WHERE " +
             "(t.user.id = :userId) AND " +
             "(:categoryId IS NULL OR t.category.id = :categoryId) AND " +

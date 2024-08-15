@@ -188,4 +188,8 @@ public class WalletController {
         mailSender.send(message);
     }
 
+    @GetMapping("/total-amount/{userId}")
+    public ResponseEntity<?> getTotalAmount(@PathVariable Long userId){
+        return new ResponseEntity<>(walletService.getTotalAmount(userId),HttpStatus.OK);
+    }
 }

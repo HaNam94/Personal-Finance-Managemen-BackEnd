@@ -10,7 +10,7 @@ public interface TransactionInfoDto {
     Long getId();
     String getNote();
     BigDecimal getAmount();
-    @JsonFormat(pattern="dd-MM-yyyy")
+//    @JsonFormat(pattern="dd-MM-yyyy")
     LocalDate getDatetime();
     @Value("#{target.category.icon}")
     String getIcon();
@@ -20,4 +20,6 @@ public interface TransactionInfoDto {
     String getCategoryName();
     @Value("#{target.wallet.walletName}")
     String getWalletName();
+    Long getCategoryId();
+    Long getWalletId();
 }
