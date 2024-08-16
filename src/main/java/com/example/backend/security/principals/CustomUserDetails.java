@@ -1,5 +1,6 @@
 package com.example.backend.security.principals;
 
+import com.example.backend.model.entity.Budget;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -53,7 +54,4 @@ public class CustomUserDetails implements UserDetails {
         return status;
     }
 
-    public Long getUserId() {
-        return null;
-    }
 }
