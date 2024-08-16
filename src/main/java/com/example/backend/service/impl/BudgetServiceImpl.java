@@ -48,7 +48,7 @@ public class BudgetServiceImpl implements IBudgetService {
         }
 
         budgetRepository.save(budget);
-        return null;
+        return budget;
     }
 
     @Override

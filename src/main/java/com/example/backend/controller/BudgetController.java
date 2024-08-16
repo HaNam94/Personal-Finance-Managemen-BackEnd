@@ -50,12 +50,12 @@ public class BudgetController {
         }
     }
 
-    @GetMapping("/statistics/{year}/{month}")
+ /*   @GetMapping("/statistics/{year}/{month}")
     public ResponseEntity<List<Budget>> getMonthlyBudgetStatistics(@PathVariable int year,
                                                                    @PathVariable int month,
                                                                    @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        List<Budget> monthlyBudgets = budgetService.getMonthlyBudgetStatistics(customUserDetails.getUserId(), year, month);
+        List<Budget> monthlyBudgets = budgetService.getMonthlyBudgetStatistics(CustomUserDetails.getUserId(), year, month);
         return new ResponseEntity<>(monthlyBudgets, HttpStatus.OK);
-    }
+    } */
 }
 
