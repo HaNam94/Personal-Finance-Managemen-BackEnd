@@ -20,6 +20,8 @@ public interface TransactionInfoDto {
     String getCategoryName();
     @Value("#{target.wallet.walletName}")
     String getWalletName();
+    @Value("#{target.category.id}")
     Long getCategoryId();
+    @Value("#{target.wallet.id}")
     Long getWalletId();
 }
