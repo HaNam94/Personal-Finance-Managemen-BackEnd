@@ -183,8 +183,8 @@ public class TransactionServiceImpl implements ITransactionService {
     }
 
     @Override
-    public List<TransactionSimpleDto> searchTransactionWithUserId(Long userId, Long categoryId) {
-        return transactionRepository.findAllByUserIdAndCategoryId(userId, categoryId);
+    public List<TransactionSimpleDto> searchTransactionWithUserId(Long userId, Long categoryId, Long walletId, String startDate, String endDate) {
+        return transactionRepository.searchAllTransaction(userId, categoryId, walletId, startDate, endDate);
     }
 
 

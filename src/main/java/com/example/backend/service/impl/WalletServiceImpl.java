@@ -60,7 +60,7 @@ public class WalletServiceImpl implements IWalletService {
         wallet = walletRepository.save(wallet);
 
         if(wallet.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-            createTransaction(wallet, ownerId, wallet.getAmount(), "income", "Khoảng thu ban đầu của ví!");
+            createTransaction(wallet, ownerId, wallet.getAmount(), "income", false, "Khoảng thu ban đầu của ví!");
         }
 
         return wallet;
@@ -93,10 +93,11 @@ public class WalletServiceImpl implements IWalletService {
                     userId,
                     walletDto.getAmount().subtract(wallet.getAmount()),
                     "income",
+                    false,
                     "Khoảng thu do thay đổi số dư ví!"
             );
         }else {
-            createTransaction(wallet, userId, wallet.getAmount().subtract(walletDto.getAmount()), "outcome", "Khoảng chi do thay đổi số dư ví!");
+            createTransaction(wallet, userId, wallet.getAmount().subtract(walletDto.getAmount()), "outcome", false, "Khoảng chi do thay đổi số dư ví!");
         }
 
         wallet.setWalletName(walletDto.getWalletName());
@@ -109,7 +110,7 @@ public class WalletServiceImpl implements IWalletService {
         return wallet;
     }
 
-    private void createTransaction(Wallet wallet, Long userId, BigDecimal subtract, String tType, String note) {
+    private void createTransaction(Wallet wallet, Long userId, BigDecimal subtract, String tType, Boolean isTransfer, String note) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng này"));
         Category category = null;
         if(Objects.equals(tType, "income")) {
@@ -125,6 +126,7 @@ public class WalletServiceImpl implements IWalletService {
                 .datetime(LocalDate.now())
                 .note(note)
                 .user(user)
+                .isTransfer(isTransfer)
                 .build();
         transactionRepository.save(transaction);
     }
@@ -213,7 +215,7 @@ public class WalletServiceImpl implements IWalletService {
     }
 
     @Override
-    public void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount) {
+    public void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount, Long userId) {
         Wallet fromWallet = walletRepository.findById(fromWalletId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy ví: " + fromWalletId));
         Wallet toWallet = walletRepository.findById(toWalletId)
@@ -222,6 +224,8 @@ public class WalletServiceImpl implements IWalletService {
         if (fromWallet.getAmount().compareTo(amount) < 0) {
             throw new RuntimeException("Số dư trong ví không đủ.");
         }
+        createTransaction(fromWallet, userId, amount, "outcome", true, "Chuyển tiền đi" );
+        createTransaction(toWallet, userId, amount, "income", true, "Nhận tiền đến");
 
         fromWallet.setAmount(fromWallet.getAmount().subtract(amount));
         toWallet.setAmount(toWallet.getAmount().add(amount));

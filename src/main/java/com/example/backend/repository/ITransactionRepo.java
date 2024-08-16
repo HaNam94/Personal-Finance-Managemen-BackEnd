@@ -28,7 +28,17 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
                                                         @Param("categoryType") Integer categoryType,
                                                         Pageable pageable);
 
-    List<TransactionSimpleDto> findAllByUserIdAndCategoryId(Long categoryId, Long userId);
+    @Query("SELECT t FROM Transaction t WHERE " +
+            "(t.user.id = :userId) AND " +
+            "(:categoryId IS NULL OR t.category.id = :categoryId) AND " +
+            "(:walletId IS NULL OR t.wallet.id = :walletId) AND " +
+            "(:startDate IS NULL OR t.datetime >= Date(:startDate)) AND " +
+            "(:endDate IS NULL OR t.datetime <= Date(:endDate))")
+    List<TransactionSimpleDto> searchAllTransaction(@Param("userId") Long userId,
+                                                 @Param("categoryId") Long categoryId,
+                                                 @Param("walletId") Long walletId,
+                                                 @Param("startDate") String startDate,
+                                                 @Param("endDate") String endDate);
 
     @Query("SELECT SUM(t.amount) AS totalAmount " +
             "FROM Transaction t " +

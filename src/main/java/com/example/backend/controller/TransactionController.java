@@ -81,11 +81,14 @@ public class TransactionController {
 
     @GetMapping("/search")
     public ResponseEntity<?> searchTransactions(
-            @RequestParam Long categoryId,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long walletId,
             Authentication authentication
     ) {
         UserDto user = getUserDto(authentication);
-        List<TransactionSimpleDto> transactions = transactionService.searchTransactionWithUserId(user.getId(), categoryId);
+        List<TransactionSimpleDto> transactions = transactionService.searchTransactionWithUserId(user.getId(), categoryId, walletId, startDate, endDate);
         return ResponseEntity.ok().body(transactions);
     }
 
