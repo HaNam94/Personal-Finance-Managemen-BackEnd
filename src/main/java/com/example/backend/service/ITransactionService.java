@@ -19,7 +19,7 @@ public interface ITransactionService {
 
     void updateTransaction(Long id, TransactionDto transactionDto);
 
-    List<TransactionSimpleDto> searchTransactionWithUserId(Long id, Long categoryId);
+    List<TransactionSimpleDto> searchTransactionWithUserId(Long id, Long categoryId, Long walletId, String startDate, String endDate);
 
     Page<TransactionInfoDto> findAllTransactionByUserId(Long id, Long categoryId, Integer categoryType, int page);
 

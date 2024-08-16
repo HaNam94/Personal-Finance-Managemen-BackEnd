@@ -11,7 +11,7 @@ import java.util.Set;
 public interface IWalletService {
     Wallet saveWallet(Long ownerId, WalletDto walletDto);
 
-    Wallet updateWallet(Long walletId, WalletDto walletDto);
+    Wallet updateWallet(Long walletId, Long userId, WalletDto walletDto);
 
     WalletDto findWalletById(Long id);
 
@@ -30,6 +30,6 @@ public interface IWalletService {
     void removeWalletShare(Long walletId, String email);
     void updateWalletRole(Long walletId, Long userId, WalletRole walletRoleName);
 
-    void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount);
+    void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount, Long userId);
     BigDecimal getTotalAmount(Long userId);
 }
