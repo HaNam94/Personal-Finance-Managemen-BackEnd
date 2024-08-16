@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.BudgetDto;
+import com.example.backend.dto.BudgetStatisticsDto;
 import com.example.backend.model.entity.Budget;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IBudgetService;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/budgets")
+@RequestMapping("/api/v1/public/budgets")
 @RequiredArgsConstructor
 public class BudgetController {
     private final IBudgetService budgetService;
@@ -50,12 +51,12 @@ public class BudgetController {
         }
     }
 
- /*   @GetMapping("/statistics/{year}/{month}")
-    public ResponseEntity<List<Budget>> getMonthlyBudgetStatistics(@PathVariable int year,
-                                                                   @PathVariable int month,
-                                                                   @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        List<Budget> monthlyBudgets = budgetService.getMonthlyBudgetStatistics(CustomUserDetails.getUserId(), year, month);
-        return new ResponseEntity<>(monthlyBudgets, HttpStatus.OK);
-    } */
+    @GetMapping("/{id}/statistics")
+    public ResponseEntity<BudgetStatisticsDto> getBudgetStatistics(@PathVariable Long id,
+                                                                   @RequestParam int month,
+                                                                   @RequestParam int year) {
+        BudgetStatisticsDto statistics = budgetService.getBudgetStatistics(id, month, year);
+        return new ResponseEntity<>(statistics, HttpStatus.OK);
+    }
 }
 

@@ -12,9 +12,7 @@ import java.math.BigDecimal;
 public class BudgetDto {
     private Long id;
     private String budgetName;
-    private String budgetType;
     private BigDecimal budgetAmount;
     private String budgetDescription;
     private Long categoryId;
-    private Long userId;
 }
