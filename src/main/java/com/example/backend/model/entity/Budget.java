@@ -19,12 +19,11 @@ public class Budget {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String budgetName;
-    private String budgetType;
     private BigDecimal budgetAmount;
     private String budgetDescription;
     private LocalDate budgetDate;
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Category> category;
+    @OneToOne(fetch = FetchType.EAGER)
+    private Category category;
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 }

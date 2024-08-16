@@ -31,14 +31,14 @@ public class BudgetServiceImpl implements IBudgetService {
     public Budget save(BudgetDto budgetDto, CustomUserDetails customUserDetails) throws NoSuchFieldException {
         Budget budget = Budget.builder()
                 .budgetName(budgetDto.getBudgetName())
-                .budgetType(budgetDto.getBudgetType())
+
                 .budgetAmount(budgetDto.getBudgetAmount())
                 .budgetDescription(budgetDto.getBudgetDescription())
                 .budgetDate(LocalDate.now())
                 .build();
 
-        List<Category> categories = categoryRepository.findAll();
-        budget.setCategory(categories);
+//        List<Category> categories = categoryRepository.findAll();
+//        budget.setCategory(categories);
 
         User user = userRepository.findUserByEmail(customUserDetails.getEmail()).orElseThrow(() -> new NoSuchFieldException("User not found"));
         budget.setUser(user);
@@ -57,7 +57,6 @@ public class BudgetServiceImpl implements IBudgetService {
                 .orElseThrow(() -> new NoSuchFieldException("Budget not found"));
 
         existingBudget.setBudgetName(budgetDto.getBudgetName());
-        existingBudget.setBudgetType(budgetDto.getBudgetType());
         existingBudget.setBudgetAmount(budgetDto.getBudgetAmount());
         existingBudget.setBudgetDescription(budgetDto.getBudgetDescription());
         existingBudget.setBudgetDate(LocalDate.now());

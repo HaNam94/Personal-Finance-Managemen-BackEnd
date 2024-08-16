@@ -47,6 +47,8 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
+
+
     @PostMapping
     public ResponseEntity<?> addTransaction(@Valid @RequestBody TransactionDto transactionDto, BindingResult bindingResult, Authentication authentication) {
         if (bindingResult.hasErrors()) {
@@ -95,31 +97,31 @@ public class TransactionController {
     }
 
     @GetMapping("/statistical-amount-today/{categoryType}")
-    public ResponseEntity<?>statisticalAmountToday(@PathVariable("categoryType") Integer categoryType, Authentication authentication) {
+    public ResponseEntity<?> statisticalAmountToday(@PathVariable("categoryType") Integer categoryType, Authentication authentication) {
         UserDto userDto = getUserDto(authentication);
         return new ResponseEntity<>(transactionService.statisticalTotalAmountTodayByCategoryType(userDto.getId(), categoryType), HttpStatus.OK);
     }
 
     @GetMapping("/statistical-amount-by-time")
     public ResponseEntity<?> statisticalAmountTodayByTime(@RequestParam("categoryType") Integer type,
-                                                         @RequestParam("fromDate") LocalDate fromDate,
-                                                         @RequestParam("toDate") LocalDate toDate,
-                                                         Authentication authentication) {
+                                                          @RequestParam("fromDate") LocalDate fromDate,
+                                                          @RequestParam("toDate") LocalDate toDate,
+                                                          Authentication authentication) {
         UserDto userDto = getUserDto(authentication);
-        return new ResponseEntity<>(transactionService.statisticalTotalAmountByTypeAndTime(type, fromDate, toDate, userDto.getId()),HttpStatus.OK);
+        return new ResponseEntity<>(transactionService.statisticalTotalAmountByTypeAndTime(type, fromDate, toDate, userDto.getId()), HttpStatus.OK);
     }
 
     @GetMapping("/statistical-amount-today-by-walletId/{type}/{walletId}")
     public ResponseEntity<?> statisticalAmountTodayByWalletId(@PathVariable("type") Integer categoryType,
-                                                              @PathVariable("walletId") Long walletId){
-        return new ResponseEntity<>(transactionService.statisticalAmountTodayByWalletId(categoryType,walletId),HttpStatus.OK);
+                                                              @PathVariable("walletId") Long walletId) {
+        return new ResponseEntity<>(transactionService.statisticalAmountTodayByWalletId(categoryType, walletId), HttpStatus.OK);
     }
 
     @GetMapping("/statistical-amount-by-walletId-and-time")
     public ResponseEntity<?> statisticalAmountByWalletIdAndTime(@RequestParam("type") Integer categoryType,
                                                                 @RequestParam("walletId") Long walletId,
                                                                 @RequestParam("fromDate") LocalDate fromDate,
-                                                                @RequestParam("toDate") LocalDate toDate){
-        return new ResponseEntity<>(transactionService.statisticalAmountByWalletIdAndTime(categoryType,walletId,fromDate,toDate),HttpStatus.OK);
+                                                                @RequestParam("toDate") LocalDate toDate) {
+        return new ResponseEntity<>(transactionService.statisticalAmountByWalletIdAndTime(categoryType, walletId, fromDate, toDate), HttpStatus.OK);
     }
 }

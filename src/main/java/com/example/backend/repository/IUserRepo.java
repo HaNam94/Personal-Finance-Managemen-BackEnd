@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -25,5 +26,6 @@ public interface IUserRepo extends JpaRepository<User, Long> {
     @Query(value = "call delete_user(:id)", nativeQuery = true)
     void deleteUserById(@Param("id") Long id);
 
-
+    @Query("SELECT u FROM User u WHERE u.isActive = true AND u.userStatus = true")
+    List<User> findAllByIsActiveAndStatus();
 }

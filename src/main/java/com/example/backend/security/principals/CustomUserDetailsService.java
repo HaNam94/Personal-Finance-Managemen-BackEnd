@@ -25,6 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = IUserRepository.findUserByEmail(email).orElseThrow(() -> new NoSuchElementException("Email khong ton tai"));
         return CustomUserDetails.builder()
+                .id(user.getId())
                 .status(user.getUserStatus())
                 .email(user.getEmail())
                 .fullName(user.getUsername())

@@ -13,7 +13,7 @@ public interface ITransactionService {
 
     TransactionDto findTransactionById(Long id);
 
-    TransactionDto save(Long userId,TransactionDto transactionDto);
+    TransactionDto save(Long userId, TransactionDto transactionDto);
 
     void deleteById(Long id);
 
