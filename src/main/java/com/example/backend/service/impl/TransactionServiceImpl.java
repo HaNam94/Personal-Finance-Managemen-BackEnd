@@ -62,7 +62,9 @@ public class TransactionServiceImpl implements ITransactionService {
         if (transaction.getCategory().getCategoryType() == 1) {
             wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
         } else if (transaction.getCategory().getCategoryType() == 0) {
-
+            if(transaction.getWallet().getAmount().compareTo(transaction.getAmount()) < 0) {
+                throw new RuntimeException("Ví không đủ số dư để thực hiện chi tiền!");
+            }
             wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
         }
         walletRepository.save(wallet);
@@ -83,6 +85,18 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Override
     public void deleteById(Long id) {
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
+        Wallet wallet = transaction.getWallet();
+
+        if (transaction.getCategory().getCategoryType() == 1) {
+            if(transaction.getWallet().getAmount().compareTo(transaction.getAmount()) < 0) {
+                    throw new RuntimeException("Ví không đủ số dư (xóa khoản thu sẽ trừ 1 khoản tương ứng trong ví)");
+            }
+            wallet.setAmount(wallet.getAmount().subtract(transaction.getAmount()));
+        }else {
+            wallet.setAmount(wallet.getAmount().add(transaction.getAmount()));
+        }
+        walletRepository.save(wallet);
         transactionRepository.deleteById(id);
     }
 

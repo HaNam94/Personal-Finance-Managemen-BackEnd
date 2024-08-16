@@ -3,18 +3,16 @@ package com.example.backend.service.impl;
 import com.example.backend.dto.WalletDto;
 import com.example.backend.dto.WalletInfoDto;
 import com.example.backend.model.WalletRole;
-import com.example.backend.model.entity.User;
-import com.example.backend.model.entity.Wallet;
-import com.example.backend.model.entity.WalletUserRole;
-import com.example.backend.repository.IUserRepo;
-import com.example.backend.repository.IWalletRepo;
-import com.example.backend.repository.IWalletUserRolesRepo;
+import com.example.backend.model.entity.*;
+import com.example.backend.repository.*;
 import com.example.backend.service.IWalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -24,7 +22,8 @@ public class WalletServiceImpl implements IWalletService {
     private final IWalletRepo walletRepository;
 
     private final IUserRepo userRepository;
-
+    private final ICategoryRepo categoryRepository;
+    private final ITransactionRepo transactionRepository;
     private final IWalletUserRolesRepo walletUserRolesRepo;
 
 
@@ -58,7 +57,13 @@ public class WalletServiceImpl implements IWalletService {
         wallet.getWalletRoles().add(walletUserRole);
         owner.getWalletRoles().add(walletUserRole);
 
-        return walletRepository.save(wallet);
+        wallet = walletRepository.save(wallet);
+
+        if(wallet.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+            createTransaction(wallet, ownerId, wallet.getAmount(), "income", "Khoảng thu ban đầu của ví!");
+        }
+
+        return wallet;
     }
 
     @Override
@@ -79,8 +84,20 @@ public class WalletServiceImpl implements IWalletService {
     }
 
     @Override
-    public Wallet updateWallet(Long walletId, WalletDto walletDto) {
+    public Wallet updateWallet(Long walletId, Long userId, WalletDto walletDto) {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
+
+        if(wallet.getAmount().compareTo(walletDto.getAmount()) < 0) {
+            createTransaction(
+                    wallet,
+                    userId,
+                    walletDto.getAmount().subtract(wallet.getAmount()),
+                    "income",
+                    "Khoảng thu do thay đổi số dư ví!"
+            );
+        }else {
+            createTransaction(wallet, userId, wallet.getAmount().subtract(walletDto.getAmount()), "outcome", "Khoảng chi do thay đổi số dư ví!");
+        }
 
         wallet.setWalletName(walletDto.getWalletName());
         wallet.setIcon(walletDto.getIcon());
@@ -90,6 +107,26 @@ public class WalletServiceImpl implements IWalletService {
         walletRepository.save(wallet);
 
         return wallet;
+    }
+
+    private void createTransaction(Wallet wallet, Long userId, BigDecimal subtract, String tType, String note) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng này"));
+        Category category = null;
+        if(Objects.equals(tType, "income")) {
+            category = categoryRepository.findCategoryByCategoryTypeAndIsDefaultAndUser(1, true, user);
+        }else {
+            category = categoryRepository.findCategoryByCategoryTypeAndIsDefaultAndUser(0, true, user);
+        }
+
+        Transaction transaction = Transaction.builder()
+                .amount(subtract)
+                .wallet(wallet)
+                .category(category)
+                .datetime(LocalDate.now())
+                .note(note)
+                .user(user)
+                .build();
+        transactionRepository.save(transaction);
     }
 
 

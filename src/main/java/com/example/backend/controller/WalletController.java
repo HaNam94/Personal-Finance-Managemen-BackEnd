@@ -80,7 +80,7 @@ public class WalletController {
         if (!walletService.isOwner(id, userDto.getId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        walletService.updateWallet(id, walletDto);
+        walletService.updateWallet(id, userDto.getId(), walletDto);
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 

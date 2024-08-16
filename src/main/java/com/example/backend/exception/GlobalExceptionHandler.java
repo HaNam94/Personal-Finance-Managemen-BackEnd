@@ -30,6 +30,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(NotEnoughBalanceException.class)
+    public ResponseEntity<Map<String, String>> handleNotEnoughBalanceException(NotEnoughBalanceException ex, WebRequest request) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeExceptions(RuntimeException ex, WebRequest request) {
         Map<String, String> error = new HashMap<>();

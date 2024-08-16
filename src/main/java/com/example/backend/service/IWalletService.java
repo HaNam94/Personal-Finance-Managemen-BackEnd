@@ -11,7 +11,7 @@ import java.util.Set;
 public interface IWalletService {
     Wallet saveWallet(Long ownerId, WalletDto walletDto);
 
-    Wallet updateWallet(Long walletId, WalletDto walletDto);
+    Wallet updateWallet(Long walletId, Long userId, WalletDto walletDto);
 
     WalletDto findWalletById(Long id);
 
