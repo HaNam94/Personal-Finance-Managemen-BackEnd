@@ -12,6 +12,7 @@ import com.example.backend.repository.ITransactionRepo;
 import com.example.backend.repository.IUserRepo;
 import com.example.backend.repository.IWalletRepo;
 import com.example.backend.service.ITransactionService;
+import com.example.backend.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,7 @@ public class TransactionServiceImpl implements ITransactionService {
     private final ICategoryRepo categoryRepository;
     private final IWalletRepo walletRepository;
     private final IUserRepo userRepository;
+    private final EmailUtil emailUtil;
 
 
     @Override
@@ -195,7 +197,9 @@ public class TransactionServiceImpl implements ITransactionService {
     public BigDecimal statisticalTotalAmountTodayByCategoryType(Long userId, Integer categoryType) {
 
         Optional<BigDecimal> amount = transactionRepository.getTotalAmountTodayByCategoryType(userId, categoryType, LocalDate.now());
+
         if (amount.isEmpty()) {
+
             return BigDecimal.ZERO;
         }
         return amount.get();
@@ -213,7 +217,7 @@ public class TransactionServiceImpl implements ITransactionService {
     @Override
     public BigDecimal statisticalAmountTodayByWalletId(Integer categoryType, Long walletId) {
         Optional<BigDecimal> amount = transactionRepository.statisticalAmountTodayByWalletId(categoryType, walletId, LocalDate.now());
-        if (amount.isEmpty()){
+        if (amount.isEmpty()) {
             return BigDecimal.ZERO;
         }
         return amount.get();
