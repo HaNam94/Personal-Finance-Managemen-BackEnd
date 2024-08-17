@@ -34,9 +34,9 @@ public class TransactionServiceImpl implements ITransactionService {
 
 
     @Override
-    public Page<TransactionInfoDto> findAllTransactionByUserId(Long userId, Long categoryId, Integer categoryType, int page) {
+    public Page<TransactionInfoDto> findAllTransactionByUserId(Long userId, Long categoryId, Integer categoryType, Long walletId, String startDate, String endDate, int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        return transactionRepository.findAllTransactionByUserId(userId, categoryId, categoryType, pageable);
+        return transactionRepository.findAllTransactionByUserId(userId, categoryId, categoryType, walletId, startDate, endDate, pageable);
     }
 
 
@@ -184,6 +184,9 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Override
     public List<TransactionSimpleDto> searchTransactionWithUserId(Long userId, Long categoryId, Long walletId, String startDate, String endDate) {
+        System.out.println("=========================");
+        System.out.println(startDate);
+        System.out.println(endDate);
         return transactionRepository.searchAllTransaction(userId, categoryId, walletId, startDate, endDate);
     }
 
