@@ -38,12 +38,15 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<?> getAllTransactions(
             Authentication authentication,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
             @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long walletId,
             @RequestParam(required = false) Integer categoryType,
             @RequestParam(defaultValue = "0") int page
     ) {
         UserDto user = getUserDto(authentication);
-        Page<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId(), categoryId, categoryType, page);
+        Page<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId(), categoryId, categoryType, walletId, startDate, endDate, page);
         return ResponseEntity.ok(transactions);
     }
 

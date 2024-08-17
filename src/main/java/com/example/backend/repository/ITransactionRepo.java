@@ -21,11 +21,17 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
     @Query("SELECT t FROM Transaction t WHERE " +
             "(t.user.id = :userId) AND " +
             "(:categoryId IS NULL OR t.category.id = :categoryId) AND " +
-            "(:categoryType IS NULL OR :categoryType = 2 OR t.category.categoryType = :categoryType) " +
+            "(:categoryType IS NULL OR :categoryType = 2 OR t.category.categoryType = :categoryType) AND" +
+            "(:walletId IS NULL OR t.wallet.id = :walletId) AND " +
+            "(:startDate IS NULL OR t.datetime >= Date(:startDate)) AND " +
+            "(:endDate IS NULL OR t.datetime <= Date(:endDate)) " +
             "ORDER BY t.datetime DESC")
     Page<TransactionInfoDto> findAllTransactionByUserId(@Param("userId") Long userId,
                                                         @Param("categoryId") Long categoryId,
                                                         @Param("categoryType") Integer categoryType,
+                                                        @Param("walletId") Long walletId,
+                                                        @Param("startDate") String startDate,
+                                                        @Param("endDate") String endDate,
                                                         Pageable pageable);
 
     @Query("SELECT t FROM Transaction t WHERE " +

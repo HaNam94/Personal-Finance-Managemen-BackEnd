@@ -21,7 +21,7 @@ public interface ITransactionService {
 
     List<TransactionSimpleDto> searchTransactionWithUserId(Long id, Long categoryId, Long walletId, String startDate, String endDate);
 
-    Page<TransactionInfoDto> findAllTransactionByUserId(Long id, Long categoryId, Integer categoryType, int page);
+    Page<TransactionInfoDto> findAllTransactionByUserId(Long id, Long categoryId, Integer categoryType, Long walletId, String startDate, String endDate, int page);
 
     BigDecimal statisticalTotalAmountTodayByCategoryType(Long userId, Integer categoryType);
 
