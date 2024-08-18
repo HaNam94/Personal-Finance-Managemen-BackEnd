@@ -221,6 +221,10 @@ public class WalletServiceImpl implements IWalletService {
         Wallet toWallet = walletRepository.findById(toWalletId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy ví: " + toWalletId));
 
+        if(!fromWallet.getCurrency().equals(toWallet.getCurrency())) {
+            throw new RuntimeException("Không thể chuyển tiền giữa ví khác loại tiền tệ, việc tự động chuyển đổi sẽ gây sai lệch!");
+        }
+
         if (fromWallet.getAmount().compareTo(amount) < 0) {
             throw new RuntimeException("Số dư trong ví không đủ.");
         }

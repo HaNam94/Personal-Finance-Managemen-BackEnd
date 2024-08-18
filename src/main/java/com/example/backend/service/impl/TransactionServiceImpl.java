@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -189,6 +186,13 @@ public class TransactionServiceImpl implements ITransactionService {
             wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
         }else {
             wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
+        }
+
+        if(wallet.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("Ví không đủ số dư để chỉnh sửa giao dịch này");
+        }
+        if(!Objects.equals(oldWallet.getId(), wallet.getId()) && oldWallet.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("Ví không đủ số dư để chỉnh sửa giao dịch này");
         }
 
 
