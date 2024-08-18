@@ -14,13 +14,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
 
     @Query("SELECT t FROM Transaction t WHERE " +
             "(t.user.id = :userId) AND " +
-            "(:categoryId IS NULL OR t.category.id = :categoryId) AND " +
+            "(:categoryId IS NULL OR t.category.id = :categoryId OR t.category.parentCategory.id = :categoryId) AND " +
             "(:categoryType IS NULL OR :categoryType = 2 OR t.category.categoryType = :categoryType) AND" +
             "(:walletId IS NULL OR t.wallet.id = :walletId) AND " +
             "(:startDate IS NULL OR t.datetime >= Date(:startDate)) AND " +
