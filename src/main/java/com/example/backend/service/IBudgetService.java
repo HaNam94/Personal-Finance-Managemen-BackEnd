@@ -13,6 +13,7 @@ public interface IBudgetService {
     Budget findBudgetById(Long id);
     void deleteBudgetById(Long id) throws NoSuchFieldException;
     Budget updateBudget(Long id, BudgetDto budgetDto) throws NoSuchFieldException;
+    List<Budget> getMonthlyBudgetStatistics(Long userId, int year, int month);
 
     BudgetStatisticsDto getBudgetStatistics(Long id, int month, int year);
 }

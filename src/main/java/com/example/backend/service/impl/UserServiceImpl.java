@@ -71,16 +71,11 @@ public class UserServiceImpl implements IUserService {
                 map.put(err.getField(), err.getDefaultMessage());
             }
         }
-        if (map.size() > 0) {
+        if (!map.isEmpty()) {
             throw new CustomValidationException(map);
         }
         String otpCode = generateRandomString(6);
-        try {
-            emailUtil.sendOtpEmail(formRegister.getEmail(), otpCode, formRegister.getUsername());
-        } catch (MessagingException e) {
-            map.put("otpCode", "Co loi trong qua trinh gui email");
-            throw new CustomValidationException(map);
-        }
+
         User user = User.builder()
                 .username(formRegister.getUsername())
                 .email(formRegister.getEmail())
@@ -99,6 +94,12 @@ public class UserServiceImpl implements IUserService {
         ResponseSuccess response = ResponseSuccess.builder()
                 .message("DK OK")
                 .build();
+        try {
+            emailUtil.sendOtpEmail(formRegister.getEmail(), otpCode, formRegister.getUsername());
+        } catch (MessagingException e) {
+            map.put("otpCode", "Co loi trong qua trinh gui email");
+            throw new CustomValidationException(map);
+        }
         return response;
 
     }
