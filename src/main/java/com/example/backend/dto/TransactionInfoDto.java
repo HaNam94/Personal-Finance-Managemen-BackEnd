@@ -25,4 +25,6 @@ public interface TransactionInfoDto {
     Long getCategoryId();
     @Value("#{target.wallet.id}")
     Long getWalletId();
+    @Value("#{target.wallet.currency}")
+    String getWalletCurrency();
 }

@@ -40,4 +40,7 @@
 
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
         private Set<Category> categories = new HashSet<>();
+
+        @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+        private Setting setting;
     }
