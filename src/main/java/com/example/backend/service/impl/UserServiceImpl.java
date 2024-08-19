@@ -108,7 +108,7 @@ public class UserServiceImpl implements IUserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         Category incomeCategory = new Category();
-        incomeCategory.setCategoryName("Khoảng thu ");
+        incomeCategory.setCategoryName("Khoản thu ");
         incomeCategory.setCategoryType(1);
         incomeCategory.setUser(user);
         incomeCategory.setNote("Đây là phân loại thu mặc định");
@@ -116,7 +116,7 @@ public class UserServiceImpl implements IUserService {
         incomeCategory.setIsDefault(true);
 
         Category expenseCategory = new Category();
-        expenseCategory.setCategoryName("Khoảng chi");
+        expenseCategory.setCategoryName("Khoản chi");
         expenseCategory.setCategoryType(0);
         expenseCategory.setUser(user);
         expenseCategory.setNote("Đây là phân loại chi mặc định");
