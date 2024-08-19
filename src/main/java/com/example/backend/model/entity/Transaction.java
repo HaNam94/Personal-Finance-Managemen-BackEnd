@@ -22,6 +22,9 @@ public class Transaction {
     private BigDecimal amount;
     private LocalDate datetime;
 
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isTransfer = false;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;

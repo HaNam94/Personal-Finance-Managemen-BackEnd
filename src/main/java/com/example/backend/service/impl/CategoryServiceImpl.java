@@ -45,6 +45,7 @@ public class CategoryServiceImpl implements ICategoryService {
         if(categoryFormDto.getParentId() != null) {
             Category parentCategory = categoryRepo.findById(categoryFormDto.getParentId()).orElseThrow(() -> new RuntimeException("Cannot find parent category"));
             category.setParentCategory(parentCategory);
+            category.setCategoryType(parentCategory.getCategoryType());
         }
         categoryRepo.save(category);
     }

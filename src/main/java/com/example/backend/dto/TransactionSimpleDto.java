@@ -9,6 +9,7 @@ public interface TransactionSimpleDto {
     Long getId();
     String getNote();
     BigDecimal getAmount();
+    Boolean getIsTransfer();
     LocalDate getDatetime();
     @Value("#{target.category.icon}")
     String getIcon();

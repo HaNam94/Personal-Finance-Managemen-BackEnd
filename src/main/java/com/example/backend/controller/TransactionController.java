@@ -38,12 +38,15 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<?> getAllTransactions(
             Authentication authentication,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
             @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long walletId,
             @RequestParam(required = false) Integer categoryType,
             @RequestParam(defaultValue = "0") int page
     ) {
         UserDto user = getUserDto(authentication);
-        Page<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId(), categoryId, categoryType, page);
+        Page<TransactionInfoDto> transactions = transactionService.findAllTransactionByUserId(user.getId(), categoryId, categoryType, walletId, startDate, endDate, page);
         return ResponseEntity.ok(transactions);
     }
 
@@ -83,11 +86,14 @@ public class TransactionController {
 
     @GetMapping("/search")
     public ResponseEntity<?> searchTransactions(
-            @RequestParam Long categoryId,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long walletId,
             Authentication authentication
     ) {
         UserDto user = getUserDto(authentication);
-        List<TransactionSimpleDto> transactions = transactionService.searchTransactionWithUserId(user.getId(), categoryId);
+        List<TransactionSimpleDto> transactions = transactionService.searchTransactionWithUserId(user.getId(), categoryId, walletId, startDate, endDate);
         return ResponseEntity.ok().body(transactions);
     }
 

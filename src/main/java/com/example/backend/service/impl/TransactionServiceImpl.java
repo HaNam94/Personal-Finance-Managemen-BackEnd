@@ -21,8 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +35,9 @@ public class TransactionServiceImpl implements ITransactionService {
 
 
     @Override
-    public Page<TransactionInfoDto> findAllTransactionByUserId(Long userId, Long categoryId, Integer categoryType, int page) {
+    public Page<TransactionInfoDto> findAllTransactionByUserId(Long userId, Long categoryId, Integer categoryType, Long walletId, String startDate, String endDate, int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        return transactionRepository.findAllTransactionByUserId(userId, categoryId, categoryType, pageable);
+        return transactionRepository.findAllTransactionByUserId(userId, categoryId, categoryType, walletId, startDate, endDate, pageable);
     }
 
 
@@ -64,7 +63,9 @@ public class TransactionServiceImpl implements ITransactionService {
         if (transaction.getCategory().getCategoryType() == 1) {
             wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
         } else if (transaction.getCategory().getCategoryType() == 0) {
-
+            if(transaction.getWallet().getAmount().compareTo(transaction.getAmount()) < 0) {
+                throw new RuntimeException("Ví không đủ số dư để thực hiện chi tiền!");
+            }
             wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
         }
         walletRepository.save(wallet);
@@ -85,94 +86,133 @@ public class TransactionServiceImpl implements ITransactionService {
 
     @Override
     public void deleteById(Long id) {
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
+        Wallet wallet = transaction.getWallet();
+
+        if (transaction.getCategory().getCategoryType() == 1) {
+            if(transaction.getWallet().getAmount().compareTo(transaction.getAmount()) < 0) {
+                    throw new RuntimeException("Ví không đủ số dư (xóa khoản thu sẽ trừ 1 khoản tương ứng trong ví)");
+            }
+            wallet.setAmount(wallet.getAmount().subtract(transaction.getAmount()));
+        }else {
+            wallet.setAmount(wallet.getAmount().add(transaction.getAmount()));
+        }
+        walletRepository.save(wallet);
         transactionRepository.deleteById(id);
     }
 
     @Override
     public void updateTransaction(Long id, TransactionDto transactionDto) {
         Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new RuntimeException("Transaction not found"));
-        Category category = categoryRepository.findById(transactionDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
-        Long a = transaction.getWallet().getId();
-        Long b = transactionDto.getWalletId();
-        Wallet wallet = walletRepository.findById(transactionDto.getWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
-
         Wallet oldWallet = walletRepository.findById(transaction.getWallet().getId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
 
+        Category category = categoryRepository.findById(transactionDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
+//        Long a = transaction.getWallet().getId();
+//        Long b = transactionDto.getWalletId();
+        Wallet wallet = walletRepository.findById(transactionDto.getWalletId()).orElseThrow(() -> new RuntimeException("Wallet not found"));
 
-        if (wallet.getId() == oldWallet.getId()) {
-            // old la thu - new la chi
-            if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
-                BigDecimal newAmount = oldWallet.getAmount().subtract(transaction.getAmount()).subtract(transactionDto.getAmount());
-                wallet.setAmount(newAmount);
 
-            }
-            // old la thu - new la thu
-            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
-                BigDecimal newAmount = oldWallet.getAmount().subtract(transaction.getAmount()).add(transactionDto.getAmount());
-                wallet.setAmount(newAmount);
-            }
-            // old la chi - new la chi
-            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 0) {
-                BigDecimal newAmount = oldWallet.getAmount().add(transaction.getAmount()).subtract(transactionDto.getAmount());
-                wallet.setAmount(newAmount);
-            }
-            // old la chi - new la thu
-            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
-                BigDecimal newAmount = oldWallet.getAmount().add(transaction.getAmount()).add(transactionDto.getAmount());
-                wallet.setAmount(newAmount);
-            }
-            walletRepository.save(wallet);
 
-        } else {
-            // old la thu - new la chi
-            if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
-                BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
-                BigDecimal newAmount = wallet.getAmount().subtract(transactionDto.getAmount());
-                oldWallet.setAmount(oldAmount);
-                wallet.setAmount(newAmount);
+//        if (wallet.getId() == oldWallet.getId()) {
+//            // old la thu - new la chi
+//            if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
+//                BigDecimal newAmount = oldWallet.getAmount().subtract(transaction.getAmount()).subtract(transactionDto.getAmount());
+//                wallet.setAmount(newAmount);
+//
+//            }
+//            // old la thu - new la thu
+//            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
+//                BigDecimal newAmount = oldWallet.getAmount().subtract(transaction.getAmount()).add(transactionDto.getAmount());
+//                wallet.setAmount(newAmount);
+//            }
+//            // old la chi - new la chi
+//            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 0) {
+//                BigDecimal newAmount = oldWallet.getAmount().add(transaction.getAmount()).subtract(transactionDto.getAmount());
+//                wallet.setAmount(newAmount);
+//            }
+//            // old la chi - new la thu
+//            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
+//                BigDecimal newAmount = oldWallet.getAmount().add(transaction.getAmount()).add(transactionDto.getAmount());
+//                wallet.setAmount(newAmount);
+//            }
+//            walletRepository.save(wallet);
+//
+//        } else {
+//            // old la thu - new la chi
+//            if (transaction.getCategory().getCategoryType() == 1 && category.getCategoryType() == 0) {
+//                BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
+//                BigDecimal newAmount = wallet.getAmount().subtract(transactionDto.getAmount());
+//                oldWallet.setAmount(oldAmount);
+//                wallet.setAmount(newAmount);
+//
+//            }
+//            // old la thu - new la thu
+//            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
+//                BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
+//                BigDecimal newAmount = wallet.getAmount().add(transactionDto.getAmount());
+//                oldWallet.setAmount(oldAmount);
+//                wallet.setAmount(newAmount);
+//
+//            }
+//            // old la chi - new la chi
+//            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 0) {
+//                BigDecimal oldAmount = oldWallet.getAmount().add(transaction.getAmount());
+//                BigDecimal newAmount = wallet.getAmount().subtract(transactionDto.getAmount());
+//                oldWallet.setAmount(oldAmount);
+//                wallet.setAmount(newAmount);
+//
+//            }
+//            // old la chi - new la thu
+//            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
+//                BigDecimal oldAmount = oldWallet.getAmount().add(transaction.getAmount());
+//                BigDecimal newAmount = wallet.getAmount().add(transactionDto.getAmount());
+//                oldWallet.setAmount(oldAmount);
+//                wallet.setAmount(newAmount);
+//
+//            }
+//            walletRepository.save(oldWallet);
+//            walletRepository.save(wallet);
+//
+//        }
 
-            }
-            // old la thu - new la thu
-            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
-                BigDecimal oldAmount = oldWallet.getAmount().subtract(transaction.getAmount());
-                BigDecimal newAmount = wallet.getAmount().add(transactionDto.getAmount());
-                oldWallet.setAmount(oldAmount);
-                wallet.setAmount(newAmount);
 
-            }
-            // old la chi - new la chi
-            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 0) {
-                BigDecimal oldAmount = oldWallet.getAmount().add(transaction.getAmount());
-                BigDecimal newAmount = wallet.getAmount().subtract(transactionDto.getAmount());
-                oldWallet.setAmount(oldAmount);
-                wallet.setAmount(newAmount);
-
-            }
-            // old la chi - new la thu
-            else if (transaction.getCategory().getCategoryType() == 0 && category.getCategoryType() == 1) {
-                BigDecimal oldAmount = oldWallet.getAmount().add(transaction.getAmount());
-                BigDecimal newAmount = wallet.getAmount().add(transactionDto.getAmount());
-                oldWallet.setAmount(oldAmount);
-                wallet.setAmount(newAmount);
-
-            }
-            walletRepository.save(oldWallet);
-            walletRepository.save(wallet);
-
+        if(transaction.getCategory().getCategoryType() == 1) {
+            oldWallet.setAmount(oldWallet.getAmount().subtract(transaction.getAmount()));
+        }else {
+            oldWallet.setAmount(oldWallet.getAmount().add(transaction.getAmount()));
         }
+
+        if(category.getCategoryType() == 1) {
+            wallet.setAmount(wallet.getAmount().add(transactionDto.getAmount()));
+        }else {
+            wallet.setAmount(wallet.getAmount().subtract(transactionDto.getAmount()));
+        }
+
+        if(wallet.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("Ví không đủ số dư để chỉnh sửa giao dịch này");
+        }
+        if(!Objects.equals(oldWallet.getId(), wallet.getId()) && oldWallet.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("Ví không đủ số dư để chỉnh sửa giao dịch này");
+        }
+
+
         transaction.setNote(transactionDto.getNote());
-        transaction.setAmount(transactionDto.getAmount());
         transaction.setDatetime(transactionDto.getDatetime());
+        transaction.setAmount(transactionDto.getAmount());
         transaction.setCategory(category);
         transaction.setWallet(wallet);
-
+        walletRepository.save(oldWallet);
+        walletRepository.save(wallet);
         transactionRepository.save(transaction);
 
     }
 
     @Override
-    public List<TransactionSimpleDto> searchTransactionWithUserId(Long userId, Long categoryId) {
-        return transactionRepository.findAllByUserIdAndCategoryId(userId, categoryId);
+    public List<TransactionSimpleDto> searchTransactionWithUserId(Long userId, Long categoryId, Long walletId, String startDate, String endDate) {
+        System.out.println("=========================");
+        System.out.println(startDate);
+        System.out.println(endDate);
+        return transactionRepository.searchAllTransaction(userId, categoryId, walletId, startDate, endDate);
     }
 
 

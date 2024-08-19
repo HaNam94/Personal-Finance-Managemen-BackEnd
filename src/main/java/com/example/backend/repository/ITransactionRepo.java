@@ -14,21 +14,38 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
 
     @Query("SELECT t FROM Transaction t WHERE " +
             "(t.user.id = :userId) AND " +
-            "(:categoryId IS NULL OR t.category.id = :categoryId) AND " +
-            "(:categoryType IS NULL OR :categoryType = 2 OR t.category.categoryType = :categoryType) " +
+            "(:categoryId IS NULL OR t.category.id = :categoryId OR t.category.parentCategory.id = :categoryId) AND " +
+            "(:categoryType IS NULL OR :categoryType = 2 OR t.category.categoryType = :categoryType) AND" +
+            "(:walletId IS NULL OR t.wallet.id = :walletId) AND " +
+            "(:startDate IS NULL OR t.datetime >= Date(:startDate)) AND " +
+            "(:endDate IS NULL OR t.datetime <= Date(:endDate)) " +
             "ORDER BY t.datetime DESC")
     Page<TransactionInfoDto> findAllTransactionByUserId(@Param("userId") Long userId,
                                                         @Param("categoryId") Long categoryId,
                                                         @Param("categoryType") Integer categoryType,
+                                                        @Param("walletId") Long walletId,
+                                                        @Param("startDate") String startDate,
+                                                        @Param("endDate") String endDate,
                                                         Pageable pageable);
 
-    List<TransactionSimpleDto> findAllByUserIdAndCategoryId(Long categoryId, Long userId);
+    @Query("SELECT t FROM Transaction t WHERE " +
+            "(t.user.id = :userId) AND " +
+            "(:categoryId IS NULL OR t.category.id = :categoryId OR t.category.parentCategory.id = :categoryId) AND " +
+            "(:walletId IS NULL OR t.wallet.id = :walletId) AND " +
+            "(:startDate IS NULL OR t.datetime >= Date(:startDate)) AND " +
+            "(:endDate IS NULL OR t.datetime <= Date(:endDate))")
+    List<TransactionSimpleDto> searchAllTransaction(@Param("userId") Long userId,
+                                                 @Param("categoryId") Long categoryId,
+                                                 @Param("walletId") Long walletId,
+                                                 @Param("startDate") String startDate,
+                                                 @Param("endDate") String endDate);
 
     @Query("SELECT SUM(t.amount) AS totalAmount " +
             "FROM Transaction t " +

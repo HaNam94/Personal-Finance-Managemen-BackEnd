@@ -80,7 +80,7 @@ public class WalletController {
         if (!walletService.isOwner(id, userDto.getId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        walletService.updateWallet(id, walletDto);
+        walletService.updateWallet(id, userDto.getId(), walletDto);
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 
@@ -161,9 +161,11 @@ public class WalletController {
     public ResponseEntity<String> transferMoney(
             @PathVariable(value = "fromWalletId", required = false) Long fromWalletId,
             @PathVariable(value = "toWalletId", required = false) Long toWalletId,
-            @PathVariable(value = "amount", required = false) BigDecimal amount) {
-
-        walletService.transferMoney(fromWalletId, toWalletId, amount);
+            @PathVariable(value = "amount", required = false) BigDecimal amount,
+            Authentication authentication
+            ) {
+        UserDto userDto = getUserDto(authentication);
+        walletService.transferMoney(fromWalletId, toWalletId, amount, userDto.getId());
         return ResponseEntity.ok("Transfer successful");
     }
     private void sendEmail(String email) throws  MessagingException{

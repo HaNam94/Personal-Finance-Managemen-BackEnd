@@ -18,5 +18,6 @@ public class TransactionDto {
     private Integer categoryType;
     private Long categoryId;
     private Long walletId;
+    private Boolean isTransfer;
 
 }
