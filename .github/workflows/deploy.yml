@@ -38,5 +38,6 @@ jobs:
             git pull origin dev
             chmod +x ./gradlew
             ./gradlew build
+          
             sudo systemctl restart qnsk
           EOF
