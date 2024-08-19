@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.BudgetDto;
+import com.example.backend.dto.BudgetInfoDto;
 import com.example.backend.dto.BudgetStatisticsDto;
 import com.example.backend.model.entity.Budget;
 import com.example.backend.security.principals.CustomUserDetails;
@@ -15,4 +16,6 @@ public interface IBudgetService {
     Budget updateBudget(Long id, BudgetDto budgetDto) throws NoSuchFieldException;
 
     BudgetStatisticsDto getBudgetStatistics(Long id, int month, int year);
+
+    Iterable<BudgetInfoDto> findAll(Long id);
 }

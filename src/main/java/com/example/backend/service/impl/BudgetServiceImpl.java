@@ -1,6 +1,7 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.BudgetDto;
+import com.example.backend.dto.BudgetInfoDto;
 import com.example.backend.dto.BudgetStatisticsDto;
 import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.model.entity.Budget;
@@ -97,6 +98,11 @@ public class BudgetServiceImpl implements IBudgetService {
                 .remainingAmount(remainingAmount)
                 .transactions(transactions)
                 .build();
+    }
+
+    @Override
+    public Iterable<BudgetInfoDto> findAll(Long userId) {
+        return budgetRepository.findAllByUserId(userId);
     }
 
 
