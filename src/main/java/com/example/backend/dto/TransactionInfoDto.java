@@ -11,7 +11,6 @@ public interface TransactionInfoDto {
     String getNote();
     BigDecimal getAmount();
     Boolean getIsTransfer();
-//    @JsonFormat(pattern="dd-MM-yyyy")
     LocalDate getDatetime();
     @Value("#{target.category.icon}")
     String getIcon();
