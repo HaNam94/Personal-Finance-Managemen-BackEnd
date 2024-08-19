@@ -126,4 +126,30 @@ public class EmailUtil {
         }
 
     }
+
+    @Scheduled(cron = "0 0 10 ? * SUN")
+    public void sendWeeklyEmail() throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        LocalDate today = LocalDate.now();
+        if (!isLastDayOfMonth(today)) {
+            mimeMessageHelper.setTo("phamtienquang57@gmail.com");
+            mimeMessageHelper.setSubject("Gửi email tu dong");
+            mimeMessageHelper.setText("<div>Day la tong thu ngay hom nay cua ban:</div>", true);
+            javaMailSender.send(mimeMessage);
+            System.out.println("Email sent successfully");
+        }
+    }
+
+    @Scheduled(cron = "0 0 10 L * ?") // gui vao 10 gio sang trong ngay cuoi cua thang
+    public void sendMonthlyEmail() throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+        mimeMessageHelper.setTo("phamtienquang57@gmail.com");
+        mimeMessageHelper.setSubject("Báo cao thu thu tri");
+        mimeMessageHelper.setText("<div>Day la tong thu ngay hom nay cua ban:</div>", true);
+        javaMailSender.send(mimeMessage);
+        System.out.println("Email sent successfully");
+    }
 }
