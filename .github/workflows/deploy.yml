@@ -36,6 +36,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@14.225.218.31 << 'EOF'
             cd /home/qnsk-api || exit
             git pull origin dev
+            chmod +x ./gradlew
             ./gradlew build
-            sudo systemctl restart your-spring-boot-app
+            sudo systemctl restart qnsk
           EOF

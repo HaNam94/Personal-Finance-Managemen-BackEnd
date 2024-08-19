@@ -84,6 +84,7 @@ public class UserServiceImpl implements IUserService {
                 .isDelete(false)
                 .userStatus(true)
                 .isActive(false)
+                .setting(new Setting())
                 .build();
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findRolesByRoleName("ROLE_USER").orElseThrow(()-> new RuntimeException("Role not found")));
@@ -262,6 +263,14 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User findByResetToken(String token) {
         return userRepository.findByResetToken(token);
+    }
+
+    @Override
+    public void updateSetting(CustomUserDetails userDetails, Setting setting) {
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setSetting(setting);
+        userRepository.save(user);
     }
 
     private String saveFile(MultipartFile multipartFile) {

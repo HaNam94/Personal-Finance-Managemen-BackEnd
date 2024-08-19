@@ -20,4 +20,6 @@ public interface TransactionSimpleDto {
     Integer getCategoryType();
     @Value("#{target.wallet.walletName}")
     String getWalletName();
+    @Value("#{target.wallet.currency}")
+    String getWalletCurrency();
 ;}
