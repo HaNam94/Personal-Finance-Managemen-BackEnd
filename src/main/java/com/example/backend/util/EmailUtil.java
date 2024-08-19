@@ -1,5 +1,6 @@
 package com.example.backend.util;
 
+import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.dto.UserDto;
 import com.example.backend.model.entity.User;
 import com.example.backend.repository.ITransactionRepo;
@@ -144,6 +145,12 @@ public class EmailUtil {
         LocalDate sunday = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
 
         if (!isLastDayOfMonth(today)) {
+            List<User> users = userRepository.findAll();
+            for (User user : users) {
+                List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(),monday,sunday);
+
+            }
+
             mimeMessageHelper.setTo("phamtienquang57@gmail.com");
             mimeMessageHelper.setSubject("Gửi email tu dong");
             mimeMessageHelper.setText("<div>Day la tong thu ngay hom nay cua ban:</div>", true);
