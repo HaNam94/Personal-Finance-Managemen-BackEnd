@@ -1,0 +1,42 @@
+name: Deploy Spring Boot App
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Deploy to VPS
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          # Set up SSH key
+          echo "$SSH_PRIVATE_KEY" > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add /tmp/id_rsa
+
+          # Deploy the app
+          ssh -o StrictHostKeyChecking=no root@14.225.218.31 << 'EOF'
+            cd /home/qnsk-api || exit
+            git pull origin dev
+            chmod +x ./gradlew
+            ./gradlew build
+            sudo service qnsk restart
+          EOF

@@ -71,7 +71,7 @@ public class AuthController {
         user.setResetToken(token);
         userService.save(user);
 
-        String resetPasswordLink = "http://localhost:3000/reset-password?token=" + token;
+        String resetPasswordLink = "https://app.qnsk.site/reset-password?token=" + token;
         try {
             sendEmail(email, resetPasswordLink, user.getUsername());
         } catch (MessagingException e) {
@@ -88,8 +88,10 @@ public class AuthController {
         String subject = "Khôi phục mật khẩu";
         String content = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>"
                 + "<div style='padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa;'>"
-                + "<h2 style='text-align: center; color: #007bff;'>Khôi phục mật khẩu</h2>"
+                + "<h1 style='text-align: center; color: #007bff; font-size: 35px;'>QNSK</h1>"
                 + "<div style='border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; background-color: white;'>"
+                + "<h2 style='text-align: center; color: #007bff;'>Khôi phục mật khẩu</h2>"
+
                 + "<p>Chào " + username + ",</p>"
                 + "<p>Bạn đã yêu cầu khôi phục mật khẩu. Vui lòng nhấn vào nút dưới đây để đặt lại mật khẩu của bạn:</p>"
                 + "<div style='text-align: center; margin: 20px 0;'>"
@@ -98,8 +100,7 @@ public class AuthController {
                 + "</a>"
                 + "</div>"
                 + "<p>Nếu bạn không yêu cầu khôi phục mật khẩu, vui lòng bỏ qua email này.</p>"
-                + "<p>Trân trọng,</p>"
-                + "<p>Đội ngũ hỗ trợ</p>"
+                + "<p>Trân trọng, đội ngũ hỗ trợ qnsk!</p>"
                 + "</div>"
                 + "</div>"
                 + "</div>";

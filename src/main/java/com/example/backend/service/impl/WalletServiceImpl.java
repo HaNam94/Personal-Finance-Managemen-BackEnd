@@ -96,7 +96,7 @@ public class WalletServiceImpl implements IWalletService {
                     false,
                     "Khoảng thu do thay đổi số dư ví!"
             );
-        }else {
+        } else if (wallet.getAmount().compareTo(walletDto.getAmount()) > 0) {
             createTransaction(wallet, userId, wallet.getAmount().subtract(walletDto.getAmount()), "outcome", false, "Khoảng chi do thay đổi số dư ví!");
         }
 

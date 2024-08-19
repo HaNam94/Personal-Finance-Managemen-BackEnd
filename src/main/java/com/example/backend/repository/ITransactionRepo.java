@@ -37,7 +37,7 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
 
     @Query("SELECT t FROM Transaction t WHERE " +
             "(t.user.id = :userId) AND " +
-            "(:categoryId IS NULL OR t.category.id = :categoryId) AND " +
+            "(:categoryId IS NULL OR t.category.id = :categoryId OR t.category.parentCategory.id = :categoryId) AND " +
             "(:walletId IS NULL OR t.wallet.id = :walletId) AND " +
             "(:startDate IS NULL OR t.datetime >= Date(:startDate)) AND " +
             "(:endDate IS NULL OR t.datetime <= Date(:endDate))")
