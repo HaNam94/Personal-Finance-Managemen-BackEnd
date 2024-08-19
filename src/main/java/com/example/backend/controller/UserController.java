@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.UserDto;
 import com.example.backend.dto.UserUpdateDto;
 import com.example.backend.dto.response.ResponseSuccess;
+import com.example.backend.model.entity.Setting;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,25 @@ public class UserController {
         userService.updateUser(userDetails, userUpdateDto);
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
+    @PutMapping("/me/setting")
+    public ResponseEntity<?> updateSetting(
+            @Validated @RequestBody Setting setting,
+            BindingResult bindingResult,
+            Authentication authentication
+    ) {
+        if (bindingResult.hasFieldErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        userService.updateSetting(userDetails, setting);
+        return new ResponseEntity<>("{}", HttpStatus.OK);
+    }
+
 
     @PutMapping("/me/upload-avatar")
     public ResponseEntity<?> uploadAvatar(
