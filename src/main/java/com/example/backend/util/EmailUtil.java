@@ -24,6 +24,9 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -131,7 +134,15 @@ public class EmailUtil {
     public void sendWeeklyEmail() throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+
         LocalDate today = LocalDate.now();
+        // Lấy ngày Thứ Hai của tuần hiện tại
+        LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        // Lấy ngày Chủ Nhật của tuần hiện tại
+        LocalDate sunday = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+
         if (!isLastDayOfMonth(today)) {
             mimeMessageHelper.setTo("phamtienquang57@gmail.com");
             mimeMessageHelper.setSubject("Gửi email tu dong");
@@ -139,6 +150,7 @@ public class EmailUtil {
             javaMailSender.send(mimeMessage);
             System.out.println("Email sent successfully");
         }
+
     }
 
     @Scheduled(cron = "0 0 10 L * ?") // gui vao 10 gio sang trong ngay cuoi cua thang
@@ -152,4 +164,7 @@ public class EmailUtil {
         javaMailSender.send(mimeMessage);
         System.out.println("Email sent successfully");
     }
+
+
+
 }
