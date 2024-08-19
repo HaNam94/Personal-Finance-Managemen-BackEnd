@@ -60,7 +60,7 @@ public class WalletServiceImpl implements IWalletService {
         wallet = walletRepository.save(wallet);
 
         if(wallet.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-            createTransaction(wallet, ownerId, wallet.getAmount(), "income", false, "Khoảng thu ban đầu của ví!");
+            createTransaction(wallet, ownerId, wallet.getAmount(), "income", false, "Khoản thu ban đầu của ví!");
         }
 
         return wallet;
@@ -78,7 +78,7 @@ public class WalletServiceImpl implements IWalletService {
 
     @Override
     public void updateWalletAmount(Long id, BigDecimal newAmount) {
-    Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new RuntimeException("Khong tim thay vi"));
+    Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new RuntimeException("Không tìm thấy ví"));
     wallet.setAmount(newAmount);
     walletRepository.save(wallet);
     }
@@ -94,10 +94,10 @@ public class WalletServiceImpl implements IWalletService {
                     walletDto.getAmount().subtract(wallet.getAmount()),
                     "income",
                     false,
-                    "Khoảng thu do thay đổi số dư ví!"
+                    "Khoản thu do thay đổi số dư ví!"
             );
         } else if (wallet.getAmount().compareTo(walletDto.getAmount()) > 0) {
-            createTransaction(wallet, userId, wallet.getAmount().subtract(walletDto.getAmount()), "outcome", false, "Khoảng chi do thay đổi số dư ví!");
+            createTransaction(wallet, userId, wallet.getAmount().subtract(walletDto.getAmount()), "outcome", false, "Khoản chi do thay đổi số dư ví!");
         }
 
         wallet.setWalletName(walletDto.getWalletName());
