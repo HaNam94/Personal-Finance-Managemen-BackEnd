@@ -119,21 +119,21 @@ public class EmailUtil {
     }
 
 
-
-    @Scheduled(cron = "0 0 17 * * ?") // bao cao vao 17 gio moi ngay tru chu nhat
-    public void sendTodayEmail() throws MessagingException {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-        LocalDate today = LocalDate.now();
-        if (!isLastDayOfWeek(today)) {
-            if (!isLastDayOfMonth(today)) {
-                List<User> users = userRepository.findAllByIsActiveAndStatus();
-                sendEmail("test", "test");
-            }
-
-        }
-
-    }
+//
+//    @Scheduled(cron = "0 0 17 * * ?") // bao cao vao 17 gio moi ngay tru chu nhat
+//    public void sendTodayEmail() throws MessagingException {
+//        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+//        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+//        LocalDate today = LocalDate.now();
+//        if (!isLastDayOfWeek(today)) {
+//            if (!isLastDayOfMonth(today)) {
+//                List<User> users = userRepository.findAllByIsActiveAndStatus();
+//                sendEmail("test", "test");
+//            }
+//
+//        }
+//
+//    }
 
     @Scheduled(cron = "0 0 10 ? * SUN")
     public void sendWeeklyEmail() throws MessagingException {
