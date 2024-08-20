@@ -178,6 +178,7 @@ public class WalletController {
                 + "<p style='font-size: 16px; color: #555;'>Xin chào,</p>"
                 + "<p style='font-size: 16px; color: #555;'>Chúng tôi rất vui mừng thông báo rằng bạn đã được chia sẻ một ví trong hệ thống của chúng tôi. Đây là một cơ hội tuyệt vời để bạn quản lý tài chính của mình một cách hiệu quả hơn.</p>"
                 + "<p style='font-size: 16px; color: #555;'>Nếu bạn có bất kỳ thắc mắc nào, xin vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại hỗ trợ.</p>"
+                + "<p style='font-size: 16px; color: #555;'>Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi!</p>"
                 + "<p style='font-size: 16px; color: #555;'>Trân trọng,</p>"
                 + "<p style='font-size: 16px; color: #555;'><strong>Đội ngũ Hỗ trợ</strong></p>"
                 + "<hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'/>"
