@@ -14,18 +14,21 @@ import com.example.backend.model.entity.*;
 import com.example.backend.repository.*;
 import com.example.backend.security.jwt.JWTProvider;
 import com.example.backend.security.principals.CustomUserDetails;
+import com.example.backend.security.principals.CustomUserDetailsService;
 import com.example.backend.service.IUserService;
 import com.example.backend.util.EmailUtil;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
@@ -54,6 +57,7 @@ public class UserServiceImpl implements IUserService {
     private final ITransactionRepo transactionRepository;
     private final IBudgetRepo budgetRepository;
     private final ICategoryRepo categoryRepository;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Value("${upload.path}")
     private String fileUpload;
@@ -102,6 +106,29 @@ public class UserServiceImpl implements IUserService {
             throw new CustomValidationException(map);
         }
         return response;
+
+    }
+
+    @Override
+    public User registerOnlyEmail(String email, String username) {
+        User user = User.builder()
+                .username(username)
+                .email(email)
+                .isAccountGoogle(true)
+                .isDelete(false)
+                .userStatus(true)
+                .isActive(true)
+                .setting(new Setting())
+                .build();
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findRolesByRoleName("ROLE_USER").orElseThrow(()-> new RuntimeException("Role not found")));
+        user.setRoles(roles);
+        userRepository.save(user);
+        createDefaultCategory(user.getId());
+        ResponseSuccess response = ResponseSuccess.builder()
+                .message("DK OK")
+                .build();
+        return user;
 
     }
     public void createDefaultCategory(Long userId) {
@@ -180,6 +207,22 @@ public class UserServiceImpl implements IUserService {
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String accessToken = jwtProvider.generateAccessToken(userDetails);
+        ResponseUser responseUser = ResponseUser.builder()
+                .email(user.getEmail())
+                .userStatus(user.getUserStatus())
+                .avatar(user.getAvatar())
+                .fullName(user.getUsername())
+                .isDelete(user.getIsDelete())
+                .authorities(userDetails.getAuthorities())
+                .accessToken(accessToken)
+                .build();
+        return responseUser;
+    }
+
+    @Override
+    public ResponseUser loginByUser(User user) {
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
         String accessToken = jwtProvider.generateAccessToken(userDetails);
         ResponseUser responseUser = ResponseUser.builder()
                 .email(user.getEmail())

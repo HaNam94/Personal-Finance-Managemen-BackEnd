@@ -28,4 +28,6 @@ public interface IUserService {
     User findByResetToken(String token);
 
     void updateSetting(CustomUserDetails userDetails, Setting setting);
+    User registerOnlyEmail(String email, String username);
+    ResponseUser loginByUser(User user);
 }

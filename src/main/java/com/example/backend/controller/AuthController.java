@@ -6,7 +6,10 @@ import com.example.backend.dto.response.ResponseSuccess;
 import com.example.backend.dto.response.ResponseUser;
 import com.example.backend.model.entity.ResetPasswordRequest;
 import com.example.backend.model.entity.User;
+import com.example.backend.security.principals.CustomUserDetails;
+import com.example.backend.security.principals.CustomUserDetailsService;
 import com.example.backend.service.impl.UserServiceImpl;
+import com.google.api.client.json.gson.GsonFactory;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.Valid;
@@ -14,22 +17,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.text.ParseException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
 
 @RestController
 @RequestMapping("/api/v1")
 @CrossOrigin("*")
 @RequiredArgsConstructor
 public class AuthController {
-
+    private static final String CLIENT_ID = "433942247848-u49shd599e24tin5b8i73en937r8tlob.apps.googleusercontent.com";
     private final UserServiceImpl userService;
 
     @Autowired
@@ -37,6 +47,7 @@ public class AuthController {
 
     @Autowired
     private JavaMailSender mailSender;
+
 
 
     @PostMapping("/public/login")
@@ -51,6 +62,35 @@ public class AuthController {
             return new ResponseEntity<>(responseSuccess, HttpStatus.OK);
 
     }
+    @PostMapping("/public/google-login")
+    public ResponseEntity<?> google(@RequestBody Map<String, String> request) throws GeneralSecurityException, IOException, ParseException {
+        String token = request.get("token");
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                .setAudience(Collections.singletonList(CLIENT_ID))
+                .build();
+        try {
+            System.out.println(token);
+            GoogleIdToken idToken = verifier.verify(token);
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+
+                String email = payload.getEmail();
+                String name = (String) payload.get("name");
+
+                // Kiểm tra xem người dùng đã tồn tại trong hệ thống hay chưa
+                User user = userService.findByEmail(email);
+                if (user == null) {
+                    user = userService.registerOnlyEmail(email, name);
+                }
+                return new ResponseEntity<>(userService.loginByUser(user), HttpStatus.OK);
+            } else {
+                return ResponseEntity.status(401).body("Invalid ID token.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Token verification failed.");
+        }
+    }
+
     @PutMapping("/public/verify-account")
     public ResponseEntity<String> verifyAccount(@RequestParam String email,
                                                 @RequestParam String otp) {
@@ -70,7 +110,6 @@ public class AuthController {
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
         userService.save(user);
-
         String resetPasswordLink = "https://app.qnsk.site/reset-password?token=" + token;
         try {
             sendEmail(email, resetPasswordLink, user.getUsername());
