@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
@@ -85,9 +86,10 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
             "AND MONTH(t.datetime) = :month AND YEAR(t.datetime) = :year")
     List<TransactionInfoDto> findTransactionsByBudgetAndMonth(@Param("categoryType") Integer categoryType, @Param("month") int month, @Param("year") int year);
 
-    @Query("SELECT t " +
-            "FROM Transaction  t " +
-            "WHERE t.user.id = :userId " +
-            "AND t.datetime BETWEEN :startDate AND :endDate")
-    List<TransactionInfoDto> findTransactionByUserIdBetweenStartDateAndEndDate(@Param("userId") Long userId, LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT CASE WHEN COUNT(t) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM Transaction t WHERE t.user.id = :userId AND t.datetime = :currentDate")
+    boolean existsTransactionInDayByUserId(@Param("userId") Long userId, @Param("currentDate") LocalDate currentDate);
+
+//    List<TransactionInfoDto> findTransactionByUserIdBetweenStartDateAndEndDate(@Param("userId") Long userId, LocalDate startDate, LocalDate endDate);
 }

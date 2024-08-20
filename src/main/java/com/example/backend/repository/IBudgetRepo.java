@@ -1,5 +1,6 @@
 package com.example.backend.repository;
 
+import com.example.backend.dto.BudgetInfoDto;
 import com.example.backend.model.entity.Budget;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +22,9 @@ public interface IBudgetRepo extends JpaRepository<Budget, Long> {
     List<Budget> findBudgetsByUserIdAndDateRange(@Param("userId") Long userId,
                                                  @Param("startDate") LocalDate startDate,
                                                  @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT b FROM Budget b WHERE b.user.id = :userId")
+    Iterable<BudgetInfoDto> findAllByUserId(Long userId);
+
+    Boolean existsBudgetByUserIdAndCategoryId(Long userId, Long categoryId);
 }

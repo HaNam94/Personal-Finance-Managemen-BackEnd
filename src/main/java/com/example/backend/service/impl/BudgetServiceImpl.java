@@ -1,6 +1,7 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.dto.BudgetDto;
+import com.example.backend.dto.BudgetInfoDto;
 import com.example.backend.dto.BudgetStatisticsDto;
 import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.model.entity.Budget;
@@ -41,6 +42,7 @@ public class BudgetServiceImpl implements IBudgetService {
                  .budgetName(budgetDto.getBudgetName())
                  .budgetAmount(budgetDto.getBudgetAmount())
                  .budgetDescription(budgetDto.getBudgetDescription())
+                 .currency(budgetDto.getCurrency())
                  .budgetDate(LocalDate.now())
                  .build();
 
@@ -50,9 +52,13 @@ public class BudgetServiceImpl implements IBudgetService {
          User user = userRepository.findUserByEmail(customUserDetails.getEmail()).orElseThrow(() -> new NoSuchFieldException("User not found"));
          budget.setUser(user);
 
-         if(budgetDto.getBudgetAmount().compareTo(budget.getBudgetAmount()) > 0){
-             throw new RuntimeException ("Số tiền chi tiêu vượt quá ngân sách đã đặt!");
+         if(budgetRepository.existsBudgetByUserIdAndCategoryId(user.getId(), budgetDto.getCategoryId())){
+             throw new RuntimeException("Đã có ngân sách cho phân loại này!");
          }
+
+//         if(budgetDto.getBudgetAmount().compareTo(budget.getBudgetAmount()) > 0){
+//             throw new RuntimeException ("Số tiền chi tiêu vượt quá ngân sách đã đặt!");
+//         }
 
          budgetRepository.save(budget);
          return budget;
@@ -97,6 +103,11 @@ public class BudgetServiceImpl implements IBudgetService {
                 .remainingAmount(remainingAmount)
                 .transactions(transactions)
                 .build();
+    }
+
+    @Override
+    public Iterable<BudgetInfoDto> findAll(Long userId) {
+        return budgetRepository.findAllByUserId(userId);
     }
 
 

@@ -47,22 +47,22 @@ public class EmailUtil {
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
         String subject = "Verify OTP";
-        String content = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>"
-                + "<div style='padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa;'>"
-                + "<h2 style='text-align: center; color: #007bff;'>Xác Thực Tài Khoản</h2>"
-                + "<div style='border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; background-color: white;'>"
-                + "<p>Xin chào " + username + ",</p>"
-                + "<p>Cảm ơn bạn đã đăng ký tài khoản tại [Tên Công Ty/Dịch Vụ]!</p>"
-                + "<p>Để hoàn tất quá trình đăng ký và kích hoạt tài khoản của bạn, vui lòng nhấp vào nút dưới đây để xác thực địa chỉ email của bạn:</p>"
+        String content = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>"
+                + "<h2 style='text-align: center; color: #007bff; font-size: 24px;'>Xác Thực Tài Khoản</h2>"
+                + "<p style='font-size: 16px; color: #555;'>Xin chào " + username + ",</p>"
+                + "<p style='font-size: 16px; color: #555;'>Cảm ơn bạn đã đăng ký tài khoản tại QNSK!</p>"
+                + "<p style='font-size: 16px; color: #555;'>Để hoàn tất quá trình đăng ký và kích hoạt tài khoản của bạn, vui lòng nhấp vào nút dưới đây để xác thực địa chỉ email của bạn:</p>"
                 + "<div style='text-align: center; margin: 20px 0;'>"
                 + "<a href=\"https://app.qnsk.site/verify-account?email=" + email + "&otp=" + otp + "\" style='display: inline-block; padding: 12px 24px; font-size: 16px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;'>"
                 + "Xác Thực Tài Khoản"
                 + "</a>"
                 + "</div>"
-                + "<p>Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email này và không có hành động nào khác cần thiết.</p>"
-                + "<p>Cảm ơn bạn.</p>"
-                + "</div>"
-                + "</div>"
+                + "<p style='font-size: 16px; color: #555;'>Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email này và không có hành động nào khác cần thiết.</p>"
+                + "<p style='font-size: 16px; color: #555;'>Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi!</p>"
+                + "<p style='font-size: 16px; color: #555;'>Trân trọng,</p>"
+                + "<p style='font-size: 16px; color: #555;'><strong>Đội ngũ Hỗ trợ - QNSK Team</strong></p>"
+                + "<hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'/>"
+                + "<p style='font-size: 12px; color: #777; text-align: center;'>Đây là email tự động, vui lòng không trả lời trực tiếp vào email này.</p>"
                 + "</div>";
 
         mimeMessageHelper.setTo(email);
@@ -151,7 +151,7 @@ public class EmailUtil {
         if (!isLastDayOfMonth(today)) {
             List<User> users = userRepository.findAll();
             for (User user : users) {
-                List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(),monday,sunday);
+//                List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(),monday,sunday);
 
             }
 

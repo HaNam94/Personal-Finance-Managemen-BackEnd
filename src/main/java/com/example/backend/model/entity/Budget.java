@@ -22,6 +22,7 @@ public class Budget {
     private BigDecimal budgetAmount;
     private String budgetDescription;
     private LocalDate budgetDate;
+    private String currency = "VND";
     @OneToOne(fetch = FetchType.EAGER)
     private Category category;
     @ManyToOne(fetch = FetchType.EAGER)
