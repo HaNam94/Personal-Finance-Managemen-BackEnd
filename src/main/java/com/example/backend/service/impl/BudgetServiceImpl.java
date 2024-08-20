@@ -42,6 +42,7 @@ public class BudgetServiceImpl implements IBudgetService {
                  .budgetName(budgetDto.getBudgetName())
                  .budgetAmount(budgetDto.getBudgetAmount())
                  .budgetDescription(budgetDto.getBudgetDescription())
+                 .currency(budgetDto.getCurrency())
                  .budgetDate(LocalDate.now())
                  .build();
 
@@ -51,9 +52,13 @@ public class BudgetServiceImpl implements IBudgetService {
          User user = userRepository.findUserByEmail(customUserDetails.getEmail()).orElseThrow(() -> new NoSuchFieldException("User not found"));
          budget.setUser(user);
 
-         if(budgetDto.getBudgetAmount().compareTo(budget.getBudgetAmount()) > 0){
-             throw new RuntimeException ("Số tiền chi tiêu vượt quá ngân sách đã đặt!");
+         if(budgetRepository.existsBudgetByUserIdAndCategoryId(user.getId(), budgetDto.getCategoryId())){
+             throw new RuntimeException("Đã có ngân sách cho phân loại này!");
          }
+
+//         if(budgetDto.getBudgetAmount().compareTo(budget.getBudgetAmount()) > 0){
+//             throw new RuntimeException ("Số tiền chi tiêu vượt quá ngân sách đã đặt!");
+//         }
 
          budgetRepository.save(budget);
          return budget;

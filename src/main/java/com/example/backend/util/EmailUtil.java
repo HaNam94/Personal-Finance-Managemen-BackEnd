@@ -147,7 +147,7 @@ public class EmailUtil {
         if (!isLastDayOfMonth(today)) {
             List<User> users = userRepository.findAll();
             for (User user : users) {
-                List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(),monday,sunday);
+//                List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(),monday,sunday);
 
             }
 

@@ -25,4 +25,6 @@ public interface IBudgetRepo extends JpaRepository<Budget, Long> {
 
     @Query("SELECT b FROM Budget b WHERE b.user.id = :userId")
     Iterable<BudgetInfoDto> findAllByUserId(Long userId);
+
+    Boolean existsBudgetByUserIdAndCategoryId(Long userId, Long categoryId);
 }
