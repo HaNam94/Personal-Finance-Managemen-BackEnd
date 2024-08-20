@@ -79,8 +79,15 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
                                                             @Param("fromDate") LocalDate fromDate,
                                                             @Param("toDate") LocalDate toDate);
 
-    @Query("SELECT t FROM Transaction t WHERE t.category.categoryType = :categoryType AND MONTH(t.datetime) = :month AND YEAR(t.datetime) = :year")
+    @Query("SELECT t " +
+            "FROM Transaction t " +
+            "WHERE t.category.categoryType = :categoryType " +
+            "AND MONTH(t.datetime) = :month AND YEAR(t.datetime) = :year")
     List<TransactionInfoDto> findTransactionsByBudgetAndMonth(@Param("categoryType") Integer categoryType, @Param("month") int month, @Param("year") int year);
 
+    @Query("SELECT t " +
+            "FROM Transaction  t " +
+            "WHERE t.user.id = :userId " +
+            "AND t.datetime BETWEEN :startDate AND :endDate")
     List<TransactionInfoDto> findTransactionByUserIdBetweenStartDateAndEndDate(@Param("userId") Long userId, LocalDate startDate, LocalDate endDate);
 }

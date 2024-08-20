@@ -104,9 +104,13 @@ public class EmailUtil {
         return date.getDayOfWeek() == DayOfWeek.SUNDAY;
     }
 
-    private void sendEmail(String email,String content) throws MessagingException {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+    private void sendEmail(String email,
+                           String content,
+                           List<TransactionInfoDto> transactionInfoDtos,
+                           BigDecimal totalInitialAmount,
+                           BigDecimal totalRemainingAmount,
+                           MimeMessage mimeMessage,
+                           MimeMessageHelper mimeMessageHelper) throws MessagingException {
         mimeMessageHelper.setTo(email);
         mimeMessageHelper.setSubject("Báo cao thu thu tri");
         mimeMessageHelper.setText(content, true);
@@ -158,6 +162,30 @@ public class EmailUtil {
             System.out.println("Email sent successfully");
         }
 
+    }
+
+    private BigDecimal totalInitialAmount(List<TransactionInfoDto> t){
+        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal totalIncome = BigDecimal.ZERO;
+        BigDecimal totalOutcome = BigDecimal.ZERO;
+        for (TransactionInfoDto transactionInfoDto : t) {
+            if (transactionInfoDto.getCategoryType() == 1){
+                totalIncome = totalIncome.add(transactionInfoDto.getAmount());
+            }
+            if (transactionInfoDto.getCategoryType() == 0){
+                totalOutcome = totalOutcome.add(transactionInfoDto.getAmount());
+            }
+            total = total.add(transactionInfoDto.getAmount());
+        }
+        return total.add(totalOutcome).subtract(totalIncome);
+    }
+
+    private BigDecimal totalRemainingAmount(List<TransactionInfoDto> t){
+        BigDecimal total = BigDecimal.ZERO;
+        for (TransactionInfoDto transactionInfoDto : t) {
+            total = total.add(transactionInfoDto.getAmount());
+        }
+        return total;
     }
 
     @Scheduled(cron = "0 0 10 L * ?") // gui vao 10 gio sang trong ngay cuoi cua thang
