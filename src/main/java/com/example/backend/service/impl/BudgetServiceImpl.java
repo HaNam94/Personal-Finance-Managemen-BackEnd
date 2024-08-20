@@ -113,7 +113,7 @@ public class BudgetServiceImpl implements IBudgetService {
 
     @Override
     public Budget findBudgetById(Long id) {
-        return null;
+        return budgetRepository.findById(id).orElseThrow(() -> new RuntimeException("Budget not found"));
     }
 
 

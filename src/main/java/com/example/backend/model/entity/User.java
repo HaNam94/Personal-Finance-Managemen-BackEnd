@@ -1,5 +1,6 @@
     package com.example.backend.model.entity;
 
+    import com.fasterxml.jackson.annotation.JsonIgnore;
     import jakarta.persistence.*;
     import lombok.*;
 
@@ -35,11 +36,13 @@
         @ManyToMany(fetch = FetchType.EAGER)
         private Set<Role> roles;
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        @JsonIgnore
         private Set<Budget> budgets = new HashSet<>();
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
         private Set<WalletUserRole> walletRoles = new HashSet<>();
 
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        @JsonIgnore
         private Set<Category> categories = new HashSet<>();
 
         @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
