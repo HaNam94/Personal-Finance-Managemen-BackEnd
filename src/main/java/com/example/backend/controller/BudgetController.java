@@ -33,11 +33,11 @@ public class BudgetController {
     }
 
     @PostMapping
-    public ResponseEntity<Budget> createBudget(@RequestBody BudgetDto budgetDto,
+    public ResponseEntity<?> createBudget(@RequestBody BudgetDto budgetDto,
                                                @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         try {
             Budget newBudget = budgetService.save(budgetDto, customUserDetails);
-            return new ResponseEntity<>(newBudget, HttpStatus.CREATED);
+            return new ResponseEntity<>("{}", HttpStatus.CREATED);
         } catch (NoSuchFieldException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }

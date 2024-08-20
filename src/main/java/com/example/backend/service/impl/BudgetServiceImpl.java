@@ -68,8 +68,14 @@ public class BudgetServiceImpl implements IBudgetService {
     @Override
     public Budget updateBudget(Long id, BudgetDto budgetDto) throws NoSuchFieldException{
 
+
         Budget existingBudget = budgetRepository.findById(id)
                 .orElseThrow(() -> new NoSuchFieldException("Budget not found"));
+        if(!existingBudget.getCategory().getId().equals(budgetDto.getCategoryId())){
+            if(budgetRepository.existsBudgetByUserIdAndCategoryId(existingBudget.getUser().getId(), budgetDto.getCategoryId())){
+                throw new RuntimeException("Đã có ngân sách cho phân loại này!");
+            }
+        }
 
         existingBudget.setBudgetName(budgetDto.getBudgetName());
         existingBudget.setBudgetAmount(budgetDto.getBudgetAmount());
