@@ -34,7 +34,8 @@
         private String resetTokenValidAt;
         @ManyToMany(fetch = FetchType.EAGER)
         private Set<Role> roles;
-
+        @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+        private Set<Budget> budgets = new HashSet<>();
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
         private Set<WalletUserRole> walletRoles = new HashSet<>();
 
