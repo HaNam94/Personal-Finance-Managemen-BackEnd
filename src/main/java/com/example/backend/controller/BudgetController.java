@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/budgets")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class BudgetController {
     private final IBudgetService budgetService;

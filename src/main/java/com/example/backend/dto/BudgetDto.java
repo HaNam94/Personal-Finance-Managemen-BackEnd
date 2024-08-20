@@ -15,4 +15,5 @@ public class BudgetDto {
     private BigDecimal budgetAmount;
     private String budgetDescription;
     private Long categoryId;
+    private String currency;
 }

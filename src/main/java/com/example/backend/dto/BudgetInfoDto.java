@@ -9,9 +9,14 @@ import java.util.List;
 public interface BudgetInfoDto {
     Long getId();
     String getBudgetName();
+    String getCurrency();
     BigDecimal getBudgetAmount();
     String getBudgetDescription();
     LocalDate getBudgetDate();
+    @Value("#{target.category.categoryName}")
+    String getCategoryName();
+    @Value("#{target.category.icon}")
+    String getCategoryIcon();
     @Value("#{target.category.transactions}")
     List<TransactionInfoDto> getTransactions();
 }
