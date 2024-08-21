@@ -288,7 +288,7 @@ public class UserServiceImpl implements IUserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-
+        transactionRepository.deleteAll(transactionRepository.findAllByUserId(userId));
         userRepository.delete(user);
 
       

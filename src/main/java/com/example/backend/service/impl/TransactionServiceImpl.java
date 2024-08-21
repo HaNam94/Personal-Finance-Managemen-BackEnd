@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -214,12 +215,12 @@ public class TransactionServiceImpl implements ITransactionService {
         headerRow.createCell(6).setCellValue("walletCurrency");
         headerRow.createCell(7).setCellValue("walletName");
 
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         int rowIndex = 1;
         for (TransactionSimpleDto transactionSimpleDto : transactionSimpleDtos) {
             Row row = sheet.createRow(rowIndex++);
             row.createCell(0).setCellValue(rowIndex - 1);
-            row.createCell(1).setCellValue(transactionSimpleDto.getDatetime());
+            row.createCell(1).setCellValue(transactionSimpleDto.getDatetime().format(formatter));
             row.createCell(2).setCellValue(transactionSimpleDto.getIcon());
             row.createCell(3).setCellValue(transactionSimpleDto.getCategoryName());
             row.createCell(4).setCellValue(transactionSimpleDto.getCategoryType());

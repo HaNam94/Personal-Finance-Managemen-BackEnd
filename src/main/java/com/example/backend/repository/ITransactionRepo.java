@@ -91,6 +91,7 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
             "FROM Transaction t WHERE t.user.id = :userId AND t.datetime = :currentDate")
     boolean existsTransactionInDayByUserId(@Param("userId") Long userId, @Param("currentDate") LocalDate currentDate);
 
+    Iterable<Transaction> findAllByUserId(Long userId);
     @Query("SELECT t " +
             "FROM Transaction t " +
             "WHERE t.user.id = :userId " +

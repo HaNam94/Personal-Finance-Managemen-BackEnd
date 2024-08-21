@@ -43,7 +43,7 @@ public class Category {
     @JsonIgnore
     private Set<Category> subCategories = new HashSet<>();
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "category")
     @JsonIgnore
     private Set<Transaction> transactions = new HashSet<>();
 

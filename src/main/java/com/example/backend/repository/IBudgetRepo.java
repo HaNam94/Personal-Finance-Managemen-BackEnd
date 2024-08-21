@@ -27,4 +27,5 @@ public interface IBudgetRepo extends JpaRepository<Budget, Long> {
     Iterable<BudgetInfoDto> findAllByUserId(Long userId);
 
     Boolean existsBudgetByUserIdAndCategoryId(Long userId, Long categoryId);
+    Budget findByUserIdAndCategoryId(Long userId, Long categoryId);
 }
