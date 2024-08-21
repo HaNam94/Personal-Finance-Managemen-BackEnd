@@ -32,4 +32,6 @@ public interface IWalletService {
 
     void transferMoney(Long fromWalletId, Long toWalletId, BigDecimal amount, Long userId);
     BigDecimal getTotalAmount(Long userId);
+
+    void changeStatusWallet(Long id);
 }
