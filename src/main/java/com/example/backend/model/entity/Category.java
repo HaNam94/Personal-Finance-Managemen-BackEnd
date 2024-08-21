@@ -1,5 +1,6 @@
 package com.example.backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private Category parentCategory;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
@@ -34,12 +36,15 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Category> subCategories = new HashSet<>();
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Transaction> transactions = new HashSet<>();
 
 }
