@@ -73,27 +73,6 @@ public class EmailUtil {
     }
 
 
-//    private String contentEmail(){
-//        return "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>"
-//                + "<div style='padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa;'>"
-//                + "<h2 style='text-align: center; color: #007bff;'>Xác Thực Tài Khoản</h2>"
-//                + "<div style='border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; background-color: white;'>"
-//                + "<p>Xin chào " + username + ",</p>"
-//                + "<p>Cảm ơn bạn đã đăng ký tài khoản tại [Tên Công Ty/Dịch Vụ]!</p>"
-//                + "<p>Để hoàn tất quá trình đăng ký và kích hoạt tài khoản của bạn, vui lòng nhấp vào nút dưới đây để xác thực địa chỉ email của bạn:</p>"
-//                + "<div style='text-align: center; margin: 20px 0;'>"
-//                + "<a href=\"https://app.qnsk.site/verify-account?email=" + email + "&otp=" + otp + "\" style='display: inline-block; padding: 12px 24px; font-size: 16px; color: white; background-color: #007bff; border-radius: 5px; text-decoration: none;'>"
-//                + "Xác Thực Tài Khoản"
-//                + "</a>"
-//                + "</div>"
-//                + "<p>Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email này và không có hành động nào khác cần thiết.</p>"
-//                + "<p>Cảm ơn bạn.</p>"
-//                + "</div>"
-//                + "</div>"
-//                + "</div>";
-//    }
-
-
     private boolean isLastDayOfMonth(LocalDate date) {
         // Kiểm tra nếu ngày hôm nay là ngày cuối cùng của tháng
         return date.equals(date.withDayOfMonth(date.lengthOfMonth()));
@@ -119,40 +98,26 @@ public class EmailUtil {
     }
 
 
-//
-//    @Scheduled(cron = "0 0 17 * * ?") // bao cao vao 17 gio moi ngay tru chu nhat
-//    public void sendTodayEmail() throws MessagingException {
-//        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-//        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-//        LocalDate today = LocalDate.now();
-//        if (!isLastDayOfWeek(today)) {
-//            if (!isLastDayOfMonth(today)) {
-//                List<User> users = userRepository.findAllByIsActiveAndStatus();
-//                sendEmail("test", "test");
-//            }
-//
-//        }
-//
-//    }
-
     @Scheduled(cron = "0 0 10 ? * SUN")
     public void sendWeeklyEmail() throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
 
-        LocalDate today = LocalDate.now();
+        LocalDate sunday = LocalDate.now();
         // Lấy ngày Thứ Hai của tuần hiện tại
-        LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate monday = sunday.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
         // Lấy ngày Chủ Nhật của tuần hiện tại
-        LocalDate sunday = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+//        LocalDate sunday = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
 
-        if (!isLastDayOfMonth(today)) {
-            List<User> users = userRepository.findAll();
+        if (!isLastDayOfMonth(sunday)) {
+            List<User> users = userRepository.findAllByIsActiveAndStatus();
             for (User user : users) {
-//                List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(),monday,sunday);
-
+                List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(), monday, sunday);
+                if (transactionInfoDtos.size() > 0) {
+                    Amount amount = getTotalAmount(transactionInfoDtos);
+                }
             }
 
             mimeMessageHelper.setTo("phamtienquang57@gmail.com");
@@ -164,28 +129,64 @@ public class EmailUtil {
 
     }
 
-    private BigDecimal totalInitialAmount(List<TransactionInfoDto> t){
+    private String emailContent(User user, TransactionInfoDto t, Amount amount){
+        return """
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
+                <p style='font-size: 16px; color: #555;'>Xin chào %s </p>
+                
+                </div>
+                """;
+    }
+
+    private Amount getTotalAmount(List<TransactionInfoDto> t) {
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalIncome = BigDecimal.ZERO;
         BigDecimal totalOutcome = BigDecimal.ZERO;
-        for (TransactionInfoDto transactionInfoDto : t) {
-            if (transactionInfoDto.getCategoryType() == 1){
-                totalIncome = totalIncome.add(transactionInfoDto.getAmount());
+        if (t != null) {
+            for (TransactionInfoDto transactionInfoDto : t) {
+                if (transactionInfoDto.getCategoryType() == 1) {
+                    totalIncome = totalIncome.add(transactionInfoDto.getAmount());
+                }
+                if (transactionInfoDto.getCategoryType() == 0) {
+                    totalOutcome = totalOutcome.add(transactionInfoDto.getAmount());
+                }
+                total.add(transactionInfoDto.getAmount());
             }
-            if (transactionInfoDto.getCategoryType() == 0){
-                totalOutcome = totalOutcome.add(transactionInfoDto.getAmount());
-            }
-            total = total.add(transactionInfoDto.getAmount());
+            Amount amount = new Amount(total, total.add(totalOutcome).subtract(totalIncome));
+            return amount;
         }
-        return total.add(totalOutcome).subtract(totalIncome);
+        return null;
     }
 
-    private BigDecimal totalRemainingAmount(List<TransactionInfoDto> t){
-        BigDecimal total = BigDecimal.ZERO;
-        for (TransactionInfoDto transactionInfoDto : t) {
-            total = total.add(transactionInfoDto.getAmount());
+
+    static class Amount {
+        private BigDecimal totalInitialAmount;
+        private BigDecimal totalRemainingAmount;
+
+        public Amount() {
         }
-        return total;
+
+        public Amount(BigDecimal totalInitialAmount, BigDecimal totalRemainingAmount) {
+            this.totalInitialAmount = totalInitialAmount;
+            this.totalRemainingAmount = totalRemainingAmount;
+        }
+
+        public BigDecimal getTotalInitialAmount() {
+            return totalInitialAmount;
+        }
+
+        public void setTotalInitialAmount(BigDecimal totalInitialAmount) {
+            this.totalInitialAmount = totalInitialAmount;
+        }
+
+        public BigDecimal getTotalRemainingAmount() {
+            return totalRemainingAmount;
+        }
+
+        public void setTotalRemainingAmount(BigDecimal totalRemainingAmount) {
+            this.totalRemainingAmount = totalRemainingAmount;
+        }
+
     }
 
     @Scheduled(cron = "0 0 10 L * ?") // gui vao 10 gio sang trong ngay cuoi cua thang
@@ -199,7 +200,6 @@ public class EmailUtil {
         javaMailSender.send(mimeMessage);
         System.out.println("Email sent successfully");
     }
-
 
 
 }
