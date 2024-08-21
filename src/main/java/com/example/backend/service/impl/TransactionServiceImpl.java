@@ -13,12 +13,18 @@ import com.example.backend.repository.IUserRepo;
 import com.example.backend.repository.IWalletRepo;
 import com.example.backend.service.ITransactionService;
 import com.example.backend.util.EmailUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
@@ -188,6 +194,42 @@ public class TransactionServiceImpl implements ITransactionService {
         if (amount.isEmpty()) return BigDecimal.ZERO;
         return amount.get();
 
+    }
+
+    @Override
+    public void exportToExcel(HttpServletResponse response, List<TransactionSimpleDto> transactionSimpleDtos) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=users.xlsx");
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Users");
+
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("#");
+        headerRow.createCell(1).setCellValue("datetime");
+        headerRow.createCell(2).setCellValue("icon");
+        headerRow.createCell(3).setCellValue("categoryName");
+        headerRow.createCell(4).setCellValue("categoryType");
+        headerRow.createCell(5).setCellValue("note");
+        headerRow.createCell(6).setCellValue("walletCurrency");
+        headerRow.createCell(7).setCellValue("walletName");
+
+
+        int rowIndex = 1;
+        for (TransactionSimpleDto transactionSimpleDto : transactionSimpleDtos) {
+            Row row = sheet.createRow(rowIndex++);
+            row.createCell(0).setCellValue(rowIndex - 1);
+            row.createCell(1).setCellValue(transactionSimpleDto.getDatetime());
+            row.createCell(2).setCellValue(transactionSimpleDto.getIcon());
+            row.createCell(3).setCellValue(transactionSimpleDto.getCategoryName());
+            row.createCell(4).setCellValue(transactionSimpleDto.getCategoryType());
+            row.createCell(5).setCellValue(transactionSimpleDto.getNote());
+            row.createCell(6).setCellValue(transactionSimpleDto.getWalletCurrency());
+            row.createCell(7).setCellValue(transactionSimpleDto.getWalletName());
+        }
+
+        workbook.write(response.getOutputStream());
+        workbook.close();
     }
 
 }

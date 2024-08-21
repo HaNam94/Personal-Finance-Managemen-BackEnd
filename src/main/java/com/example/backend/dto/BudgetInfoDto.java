@@ -17,6 +17,8 @@ public interface BudgetInfoDto {
     String getCategoryName();
     @Value("#{target.category.icon}")
     String getCategoryIcon();
+    @Value("#{target.category.id}")
+    Long getCategoryId();
     @Value("#{target.category.transactions}")
     List<TransactionInfoDto> getTransactions();
 }

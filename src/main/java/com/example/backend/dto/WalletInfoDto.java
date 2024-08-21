@@ -13,6 +13,7 @@ import java.util.Set;
 public interface WalletInfoDto {
     Long getId();
     String getWalletName();
+    Boolean getWalletStatus();
     String getIcon();
     String getWalletDescription();
     String getCurrency();

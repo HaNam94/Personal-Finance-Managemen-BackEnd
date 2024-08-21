@@ -1,5 +1,6 @@
 package com.example.backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,5 +27,6 @@ public class Budget {
     @OneToOne(fetch = FetchType.EAGER)
     private Category category;
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     private User user;
 }

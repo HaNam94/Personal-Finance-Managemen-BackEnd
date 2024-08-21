@@ -3,8 +3,10 @@ package com.example.backend.service;
 import com.example.backend.dto.TransactionDto;
 import com.example.backend.dto.TransactionInfoDto;
 import com.example.backend.dto.TransactionSimpleDto;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,4 +32,6 @@ public interface ITransactionService {
     BigDecimal statisticalAmountTodayByWalletId(Integer categoryType, Long walletId);
 
     BigDecimal statisticalAmountByWalletIdAndTime(Integer categoryType, Long walletId, LocalDate fromDate, LocalDate toDate);
+
+    void exportToExcel(HttpServletResponse response, List<TransactionSimpleDto> transactionSimpleDtos) throws IOException;
 }

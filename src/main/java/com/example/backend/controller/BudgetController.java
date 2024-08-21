@@ -33,11 +33,11 @@ public class BudgetController {
     }
 
     @PostMapping
-    public ResponseEntity<Budget> createBudget(@RequestBody BudgetDto budgetDto,
+    public ResponseEntity<?> createBudget(@RequestBody BudgetDto budgetDto,
                                                @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         try {
             Budget newBudget = budgetService.save(budgetDto, customUserDetails);
-            return new ResponseEntity<>(newBudget, HttpStatus.CREATED);
+            return new ResponseEntity<>("{}", HttpStatus.CREATED);
         } catch (NoSuchFieldException e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
@@ -53,7 +53,20 @@ public class BudgetController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getBudgetById(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserDto userDto = userService.findUserByEmail(userDetails.getUsername());
+        Budget budget = budgetService.findBudgetById(id);
 
+        if (!budget.getUser().getId().equals(userDto.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(budget, HttpStatus.OK);
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBudget(@PathVariable Long id) {
         try {

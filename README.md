@@ -1,3 +1,3 @@
 # Personal-Finance-Managemen-BackEnd
 
-Link app Personal-Finance-Managemen: https://qnsk.site/
+Link app demo: https://qnsk.site/
