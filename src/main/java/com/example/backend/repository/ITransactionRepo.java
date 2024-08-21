@@ -80,7 +80,10 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
                                                             @Param("fromDate") LocalDate fromDate,
                                                             @Param("toDate") LocalDate toDate);
 
-    @Query("SELECT t FROM Transaction t WHERE t.category.categoryType = :categoryType AND MONTH(t.datetime) = :month AND YEAR(t.datetime) = :year")
+    @Query("SELECT t " +
+            "FROM Transaction t " +
+            "WHERE t.category.categoryType = :categoryType " +
+            "AND MONTH(t.datetime) = :month AND YEAR(t.datetime) = :year")
     List<TransactionInfoDto> findTransactionsByBudgetAndMonth(@Param("categoryType") Integer categoryType, @Param("month") int month, @Param("year") int year);
 
 
@@ -88,5 +91,11 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
             "FROM Transaction t WHERE t.user.id = :userId AND t.datetime = :currentDate")
     boolean existsTransactionInDayByUserId(@Param("userId") Long userId, @Param("currentDate") LocalDate currentDate);
 
-//    List<TransactionInfoDto> findTransactionByUserIdBetweenStartDateAndEndDate(@Param("userId") Long userId, LocalDate startDate, LocalDate endDate);
+    @Query("SELECT t " +
+            "FROM Transaction t " +
+            "WHERE t.user.id = :userId " +
+            "AND t.datetime BETWEEN :startDate AND :endDate")
+    List<TransactionInfoDto> findTransactionByUserIdBetweenStartDateAndEndDate(@Param("userId") Long userId,
+                                                                               @Param("startDate") LocalDate startDate,
+                                                                               @Param("endDate") LocalDate endDate);
 }
