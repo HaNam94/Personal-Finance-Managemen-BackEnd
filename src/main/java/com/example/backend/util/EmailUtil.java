@@ -102,7 +102,7 @@ public class EmailUtil {
             for (User user : users) {
                 List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(), monday, sunday);
                     Amount amount = getTotalAmount(transactionInfoDtos, user.getId());
-                    mimeMessageHelper.setTo("phamtienquang57@gmail.com");
+                    mimeMessageHelper.setTo(user.getEmail());
                     mimeMessageHelper.setSubject("Ứng Dụng Quản Lý Tài Chính QNSK");
                     mimeMessageHelper.setText(emailContent(user, transactionInfoDtos,amount), true);
                     javaMailSender.send(mimeMessage);
