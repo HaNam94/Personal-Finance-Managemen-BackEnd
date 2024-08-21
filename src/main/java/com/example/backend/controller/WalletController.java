@@ -83,6 +83,18 @@ public class WalletController {
         walletService.updateWallet(id, userDto.getId(), walletDto);
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
+    @PutMapping("/{id}/change-status")
+    public ResponseEntity<?> updateStatusWallet(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        UserDto userDto = getUserDto(authentication);
+        if (!walletService.isOwner(id, userDto.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        walletService.changeStatusWallet(id);
+        return new ResponseEntity<>("{}", HttpStatus.OK);
+    }
 
     @PutMapping("/{id}/{newAmount}")
     public ResponseEntity<?> updateWalletAmount(@PathVariable Long id, @PathVariable BigDecimal newAmount ) {

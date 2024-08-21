@@ -246,5 +246,12 @@ public class WalletServiceImpl implements IWalletService {
         }
         return totalAmount.get();
     }
+
+    @Override
+    public void changeStatusWallet(Long id) {
+        Wallet wallet = walletRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy ví này"));
+        wallet.setWalletStatus(!wallet.getWalletStatus());
+        walletRepository.save(wallet);
+    }
 }
 
