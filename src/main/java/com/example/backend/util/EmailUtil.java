@@ -133,7 +133,30 @@ public class EmailUtil {
         }
     }
 
+    @Scheduled(cron = "0 0 9 L * ?") // gui vao 10 gio sang trong ngay cuoi cua thang
+    public void sendMonthlyEmail() throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
+        LocalDate today = LocalDate.now();
+
+        // Lấy ngày đầu tiên của tháng hiện tại
+        LocalDate firstDayOfMonth = today.with(TemporalAdjusters.firstDayOfMonth());
+
+        // Lấy ngày cuối cùng của tháng hiện tại
+        LocalDate lastDayOfMonth = today.with(TemporalAdjusters.lastDayOfMonth());
+
+        List<User> users = userRepository.findAllByIsActiveAndStatus();
+        for (User user : users) {
+            List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(), firstDayOfMonth, lastDayOfMonth);
+            Amount amount = getTotalAmount(transactionInfoDtos, user.getId());
+            mimeMessageHelper.setTo(user.getEmail());
+            mimeMessageHelper.setSubject("Ứng Dụng Quản Lý Tài Chính QNSK");
+            mimeMessageHelper.setText(emailContent(user, transactionInfoDtos, amount, "Tháng"), true);
+            javaMailSender.send(mimeMessage);
+            System.out.println("Email sent successfully");
+        }
+    }
 
     private String emailContent(User user, List<TransactionInfoDto> t, Amount amount, String text) {
         if (amount != null) {
