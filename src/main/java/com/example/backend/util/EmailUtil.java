@@ -5,6 +5,7 @@ import com.example.backend.dto.UserDto;
 import com.example.backend.model.entity.User;
 import com.example.backend.repository.ITransactionRepo;
 import com.example.backend.repository.IUserRepo;
+import com.example.backend.repository.IWalletRepo;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.ITransactionService;
 import com.example.backend.service.IUserService;
@@ -38,6 +39,7 @@ public class EmailUtil {
     private final JavaMailSender javaMailSender;
     private final ITransactionRepo transactionRepository;
     private final IUserRepo userRepository;
+    private final IWalletRepo walletRepository;
 
 
     public void sendOtpEmail(String email, String otp, String username) throws MessagingException {
@@ -83,20 +85,6 @@ public class EmailUtil {
         return date.getDayOfWeek() == DayOfWeek.SUNDAY;
     }
 
-    private void sendEmail(String email,
-                           String content,
-                           List<TransactionInfoDto> transactionInfoDtos,
-                           BigDecimal totalInitialAmount,
-                           BigDecimal totalRemainingAmount,
-                           MimeMessage mimeMessage,
-                           MimeMessageHelper mimeMessageHelper) throws MessagingException {
-        mimeMessageHelper.setTo(email);
-        mimeMessageHelper.setSubject("Báo cao thu thu tri");
-        mimeMessageHelper.setText(content, true);
-        javaMailSender.send(mimeMessage);
-        System.out.println("Email sent successfully");
-    }
-
 
     @Scheduled(cron = "0 0 10 ? * SUN")
     public void sendWeeklyEmail() throws MessagingException {
@@ -108,41 +96,74 @@ public class EmailUtil {
         // Lấy ngày Thứ Hai của tuần hiện tại
         LocalDate monday = sunday.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 
-        // Lấy ngày Chủ Nhật của tuần hiện tại
-//        LocalDate sunday = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
 
         if (!isLastDayOfMonth(sunday)) {
             List<User> users = userRepository.findAllByIsActiveAndStatus();
             for (User user : users) {
                 List<TransactionInfoDto> transactionInfoDtos = transactionRepository.findTransactionByUserIdBetweenStartDateAndEndDate(user.getId(), monday, sunday);
-                if (transactionInfoDtos.size() > 0) {
-                    Amount amount = getTotalAmount(transactionInfoDtos);
-                }
+                    Amount amount = getTotalAmount(transactionInfoDtos, user.getId());
+                    mimeMessageHelper.setTo("phamtienquang57@gmail.com");
+                    mimeMessageHelper.setSubject("Ứng Dụng Quản Lý Tài Chính QNSK");
+                    mimeMessageHelper.setText(emailContent(user, transactionInfoDtos,amount), true);
+                    javaMailSender.send(mimeMessage);
+                    System.out.println("Email sent successfully");
             }
 
-            mimeMessageHelper.setTo("phamtienquang57@gmail.com");
-            mimeMessageHelper.setSubject("Gửi email tu dong");
-            mimeMessageHelper.setText("<div>Day la tong thu ngay hom nay cua ban:</div>", true);
-            javaMailSender.send(mimeMessage);
-            System.out.println("Email sent successfully");
+
         }
 
     }
 
-    private String emailContent(User user, TransactionInfoDto t, Amount amount){
-        return """
-                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
-                <p style='font-size: 16px; color: #555;'>Xin chào %s </p>
-                
-                </div>
-                """;
+    private String emailContent(User user, List<TransactionInfoDto> t, Amount amount) {
+       if (amount != null) {
+           StringBuilder sb = new StringBuilder();
+           sb.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>"
+                   + "<h2 style='text-align: center; color: #007bff; font-size: 24px;'>Bảng thống kê thu chi tuần!</h2>"
+                   + "<p>Tổng số tiền ban đầu:" + amount.getTotalInitialAmount() + "</p>"
+                   + "<p>Tổng số tiền còn lại:" + amount.getTotalRemainingAmount() + "</p>"
+           );
+           if (t.size() > 0) {
+               sb.append("<p>Danh sách thu chi </p>"
+                       + "<table border=1px solid black>"
+                       + "<thead>"
+                       + "<tr>"
+                       + "<th>Tên Giao Dịch</th>"
+                       + "<th>Loại Giao Dịch</th>"
+                       + "<th>Số Tiền</th>"
+                       + "</tr>"
+                       + "</thead>"
+                       + "<tbody>");
+               for (TransactionInfoDto transactionInfoDto : t) {
+                   sb.append("<tr>"
+                           + "<td>" + transactionInfoDto.getCategoryName() + "</td>"
+                           + "<td>" + (transactionInfoDto.getCategoryType() == 1 ? "thu" : "chi") + "</td>"
+                           + "<td>" + transactionInfoDto.getAmount() + "</td>"
+                           + "</tr>");
+               }
+               sb.append("</tbody>" +
+                       "</table>");
+           } else {
+               sb.append("<p>tuần này bạn chưa có giao dịch nào!</p>");
+           }
+
+           sb.append("<p style='font-size: 16px; color: #555;'>Nếu cần hỗ trợ hoặc có bất kỳ thắc mắc nào, chúng tôi luôn sẵn sàng giúp đỡ.</p>"
+                   + "<p style='font-size: 16px; color: #555;'>Cảm ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi!</p>"
+                   + "<p style='font-size: 16px; color: #555;'>Trân trọng,</p>"
+                   + "<p style='font-size: 16px; color: #555;'><strong>Đội ngũ Hỗ trợ - QNSK Team</strong></p>"
+                   + "<hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'/>"
+                   + "<p style='font-size: 12px; color: #777; text-align: center;'>Đây là email tự động, vui lòng không trả lời trực tiếp vào email này.</p>"
+                   + "</div>");
+           return sb.toString();
+       }
+       return "Bạn chưa có ví. Vui lòng tạo vị để trải nghiệm dịch vụ của chúng tôi. xin cảm ơn! ";
+
     }
 
-    private Amount getTotalAmount(List<TransactionInfoDto> t) {
-        BigDecimal total = BigDecimal.ZERO;
+    private Amount getTotalAmount(List<TransactionInfoDto> t, Long userId) {
+        BigDecimal total = walletRepository.getTotalAmountByUserId(userId).orElse(BigDecimal.ZERO);
         BigDecimal totalIncome = BigDecimal.ZERO;
         BigDecimal totalOutcome = BigDecimal.ZERO;
-        if (t != null) {
+        if (t != null && total != BigDecimal.ZERO) {
             for (TransactionInfoDto transactionInfoDto : t) {
                 if (transactionInfoDto.getCategoryType() == 1) {
                     totalIncome = totalIncome.add(transactionInfoDto.getAmount());
@@ -152,7 +173,7 @@ public class EmailUtil {
                 }
                 total.add(transactionInfoDto.getAmount());
             }
-            Amount amount = new Amount(total, total.add(totalOutcome).subtract(totalIncome));
+            Amount amount = new Amount( total.add(totalOutcome).subtract(totalIncome),total);
             return amount;
         }
         return null;
