@@ -98,4 +98,6 @@ public interface ITransactionRepo extends JpaRepository<Transaction, Long> {
     List<TransactionInfoDto> findTransactionByUserIdBetweenStartDateAndEndDate(@Param("userId") Long userId,
                                                                                @Param("startDate") LocalDate startDate,
                                                                                @Param("endDate") LocalDate endDate);
+
+    List<TransactionInfoDto> findTransactionsByUserIdAndDatetime(Long userId, LocalDate datetime);
 }
