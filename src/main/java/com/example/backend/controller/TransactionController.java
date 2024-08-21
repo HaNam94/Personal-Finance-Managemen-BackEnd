@@ -7,6 +7,7 @@ import com.example.backend.dto.UserDto;
 import com.example.backend.security.principals.CustomUserDetails;
 import com.example.backend.service.ITransactionService;
 import com.example.backend.service.IUserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -129,5 +131,21 @@ public class TransactionController {
                                                                 @RequestParam("fromDate") LocalDate fromDate,
                                                                 @RequestParam("toDate") LocalDate toDate) {
         return new ResponseEntity<>(transactionService.statisticalAmountByWalletIdAndTime(categoryType, walletId, fromDate, toDate), HttpStatus.OK);
+    }
+
+
+    @GetMapping("/export")
+    public void exportUsersToExcel(
+            HttpServletResponse response,
+                @RequestParam(required = false) String startDate,
+                @RequestParam(required = false) String endDate,
+               @RequestParam(required = false) Long categoryId,
+                @RequestParam(required = false) Long walletId,
+                @RequestParam(required = false) String fileType,
+               Authentication authentication
+    ) throws IOException, IOException {
+        UserDto user = getUserDto(authentication);
+        List<TransactionSimpleDto> transactions = transactionService.searchTransactionWithUserId(user.getId(), categoryId, walletId, startDate, endDate);
+        transactionService.exportToExcel(response, transactions);
     }
 }
