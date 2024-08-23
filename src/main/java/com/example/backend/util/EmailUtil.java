@@ -24,12 +24,15 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
@@ -85,7 +88,7 @@ public class EmailUtil {
         return date.getDayOfWeek() == DayOfWeek.SUNDAY;
     }
 
-    @Scheduled(cron = "0 0 17 * * *")
+    @Scheduled(cron = "0 0 10 * * *")
     public void sendDayEmail() throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -163,8 +166,8 @@ public class EmailUtil {
             StringBuilder sb = new StringBuilder();
             sb.append("<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>"
                     + "<h2 style='text-align: center; color: #007bff; font-size: 24px;'>Báo Cáo Thu Chi " + text + "!</h2>"
-                    + "<p>Tổng số tiền ban đầu: " + amount.getTotalInitialAmount() + "</p>"
-                    + "<p>Tổng số tiền còn lại: " + amount.getTotalRemainingAmount() + "</p>"
+                    + "<p>Tổng số tiền ban đầu: " + NumberFormat.getCurrencyInstance(new Locale("vi","VN")).format(amount.getTotalInitialAmount()) + "</p>"
+                    + "<p>Tổng số tiền còn lại: " + NumberFormat.getCurrencyInstance(new Locale("vi","VN")).format(amount.getTotalRemainingAmount()) + "</p>"
             );
             if (t.size() > 0) {
                 sb.append("<p>Danh sách thu chi </p>"
@@ -174,6 +177,7 @@ public class EmailUtil {
                         + "<th>Tên Giao Dịch</th>"
                         + "<th>Loại Giao Dịch</th>"
                         + "<th>Số Tiền</th>"
+                        + "<th>Ngày giao dịch</th>"
                         + "</tr>"
                         + "</thead>"
                         + "<tbody>");
@@ -181,13 +185,18 @@ public class EmailUtil {
                     sb.append("<tr>"
                             + "<td>" + transactionInfoDto.getCategoryName() + "</td>"
                             + "<td>" + (transactionInfoDto.getCategoryType() == 1 ? "thu" : "chi") + "</td>"
-                            + "<td>" + transactionInfoDto.getAmount() + "</td>"
+                            + "<td>" + NumberFormat.getCurrencyInstance(new Locale("vi","VN")).format(transactionInfoDto.getAmount()) + "</td>"
+                            +"<td>" + transactionInfoDto.getDatetime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "</td>"
                             + "</tr>");
                 }
                 sb.append("</tbody>" +
                         "</table>");
             } else {
-                sb.append("<p>" + text + " này bạn chưa có giao dịch nào!</p>");
+                if (text.equals("Hôm Nay")) {
+                    sb.append("<p>" + text + " bạn chưa có giao dịch nào!</p>");
+                } else {
+                    sb.append("<p>" + text + " này bạn chưa có giao dịch nào!</p>");
+                }
             }
 
             sb.append("<p style='font-size: 16px; color: #555;'>Nếu cần hỗ trợ hoặc có bất kỳ thắc mắc nào, chúng tôi luôn sẵn sàng giúp đỡ.</p>"
